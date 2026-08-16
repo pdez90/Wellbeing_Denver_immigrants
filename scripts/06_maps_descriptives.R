@@ -427,12 +427,16 @@ var_labels <- c(
 
   hudjob_jobs_idx = "HUD Jobs Proximity Index",
 
-  segpoi_all_segregation = "POI segregation index",
-  segpoi_all_distance = "Average POI distance",
-  segpoi_grocery_distance = "Grocery distance",
-  segpoi_healthcare_distance = "Healthcare distance",
-  segpoi_park_distance = "Park POI distance",
-  segpoi_school_distance = "School POI distance",
+  # These are visitor-weighted average travel distances from the home block
+  # group to visited destinations of each type -- behavioural measures from
+  # mobile-device traces, NOT home-to-nearest-facility proximity. Labels name
+  # them accordingly so the table cannot be read as an accessibility measure.
+  segpoi_all_segregation = "Experienced income segregation across visited destinations",
+  segpoi_all_distance = "Mean travel distance to visited destinations (all types)",
+  segpoi_grocery_distance = "Mean travel distance to visited groceries",
+  segpoi_healthcare_distance = "Mean travel distance to visited healthcare",
+  segpoi_park_distance = "Mean travel distance to visited parks",
+  segpoi_school_distance = "Mean travel distance to visited schools",
 
   short_trip_zone_share_800 = "Short-trip opportunity zone share within 800 m",
 

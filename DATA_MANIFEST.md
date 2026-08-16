@@ -41,38 +41,51 @@ Total on-disk size is roughly 9 GB, dominated by the DRCOG land-cover raster.
 | `crash_2019.csv` | 04 | DRCOG regional crash records, 2019. A shapefile version exists at `crash_2019/drcog_crash_2019.shp`; the CSV is the one used. |
 | `short_trip_opportunity_zones/*.shp` | 05 | DRCOG short-trip opportunity zones. |
 | `htaindex2019_data_blkgrps_08.csv` | 05 | CNT Housing + Transportation Affordability Index, 2019, Colorado block groups. |
-| `seg_poi.csv` | 05 | Experienced segregation / POI travel dataset, 94 MB. See caution below. |
+| `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Wang et al. (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. |
 | `diversity_CO.csv` | 05 | Residential and experienced diversity, Colorado. |
 
 ## Note on `seg_poi.csv`
 
+Replication data for Wang et al. (2025), "Varying relationships between
+experienced income segregation and travel behaviour across neighbourhood social
+and urban contexts", *Nature Communications* 16:11236.
+https://doi.org/10.1038/s41467-025-66585-z — deposited at
+https://figshare.com/projects/Travel_Behaviour_and_Income_Segregation/266242
+
 Block-group file with `cbgid`, `All_segregation`, `All_distance`, `race`,
 `median_household_income`, `classification`, `residential_segregation`, and a
-`*_segregation` / `*_distance` pair for each of 16 point-of-interest categories
-(Culture, Entertainment, Grocery, Healthcare, Hospital, Hotel, LifeService,
-market, park, personalcare, religious, restaurant, school, socialassistance,
-sport, storeshopping).
+`*_segregation` / `*_distance` pair for each of the 16 activity-site categories
+the paper defines (Culture, Entertainment, Grocery, Healthcare, Hospital, Hotel,
+LifeService, market, park, personalcare, religious, restaurant, school,
+socialassistance, sport, storeshopping).
 
-These are **behavioural mobility measures, not accessibility measures**. The
-`*_distance` columns record how far residents of a block group travel to reach
-destinations of each category; they are not distances from a home to the nearest
-such facility. Three checks establish this:
+**`*_distance` is a travel distance, not a proximity measure.** Equation 9 of the
+paper defines it as the visitor-weighted mean Euclidean distance from the home
+block group to each visited point of interest, with weights given by the number
+of visitors from that block group to that POI across the year:
 
-- `segpoi_park_distance` correlates at r = .05 with `park_nearest_dist_m`, the
-  home-to-nearest-park distance computed independently in script 03.
-- `park_nearest_dist_m` ranges up to 938 m across the sample, whereas
-  `segpoi_park_distance` runs to 399 in its own units.
-- The columns are essentially uncorrelated with distance to downtown (r < .04)
-  and negatively correlated with population density, the pattern expected of
-  trip lengths rather than of proximity.
+    Distance_i = Σ_w Σ_n ( V_i,n,w × Distance_i→n ) / Σ_w Σ_n V_i,n,w
 
-The 16-category taxonomy matches the activity-site classification used in the
-experienced-segregation and travel-behaviour literature built on SafeGraph 2019
-weekly patterns. Consult the source codebook before using these columns; the
-units of the distance measures are not self-evident from the file.
+So it describes where residents of a block group actually travel, not how far
+they live from the nearest facility. Three checks in this project's data agree:
+`segpoi_park_distance` correlates at r = .05 with the home-to-nearest-park
+distance computed in script 03; the columns are essentially uncorrelated with
+distance to downtown (r < .04); and they correlate negatively with population
+density.
+
+Related columns: `classification` is the RUCA-based urbanicity level (all Denver
+block groups are Metropolitan), `race` is the majority-White / majority-POC
+split, and `residential_segregation` is the residential counterpart to the
+experienced measure.
+
+**The distance units are not stated in the article.** The distances are Euclidean
+and computed from TIGER boundary files, but neither the methods nor the figure
+captions give a unit. Check the figshare deposit before reporting these values.
 
 Script 05 merges these columns and retains them in the analysis file. **No
-`segpoi_*` variable enters any model reported in the paper.**
+`segpoi_*` variable enters any model reported in the paper.** Six of them appear
+in a descriptive table written by script 06, labelled explicitly as mean travel
+distances.
 
 ## Files written by the pipeline
 
