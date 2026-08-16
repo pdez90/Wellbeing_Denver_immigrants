@@ -1,0 +1,26 @@
+Wellbeing.Rmd -> scripts/
+
+  Rmd lines    Script
+  ---------    ------------------------------------------------
+     12- 849   99_legacy_perceived_be_models.R   (archived)
+    852-1336   01_geocode_acs.R
+   1339-1961   02_enviro_zoning_walkability_landcover.R
+   1965-2386   03_tree_parks.R
+   2389-2958   04_transport_connectivity_crash.R
+   2961-3410   05_ht_poi_stoz_diversity.R
+   3413-4099   06_maps_descriptives.R
+   4102-4367   07_tables_descriptive.R
+   4370-4869   08_models_mediation_ORIGINAL.R  (reference copy)
+                 -> split and revised into:
+                    08_domain_models.R
+                    09_mediation.R
+
+New files: 00_config.R, run_all.R, README.md, DATA_MANIFEST.md, AUDIT.md
+
+Script bodies are otherwise verbatim from the original chunks, except:
+  - hardcoded /Users/priyanka/Wellbeing paths replaced with out_dir
+  - crash and HUD Jobs source files pinned by name instead of globbed
+  - 08/09 revised (land use domain, VIFs, seeded bootstrap, table exports)
+
+Diff 08_models_mediation_ORIGINAL.R against 08_domain_models.R + 09_mediation.R
+to see exactly what changed in the analysis.

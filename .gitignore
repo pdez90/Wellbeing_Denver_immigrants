@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# NO DATA IN THIS REPOSITORY.
+# The survey contains approximate residential coordinates for 381 foreign-born
+# respondents and is not redistributable. Third-party spatial datasets are
+# large and separately licensed. See DATA_MANIFEST.md for sources.
+# ---------------------------------------------------------------------------
+data/
+*.csv
+*.xlsx
+*.xls
+*.shp
+*.shx
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.cpg
+*.gdb/
+*.tif
+*.tif.ovr
+*.gpkg
+*.geojson
+*.rda
+*.rds
+*.zip
+
+# Outputs
+*.docx
+*.html
+*.png
+*.pdf
+maps_outputs/
+word_ready_tables/
+word_ready_model_tables/
+sessionInfo.txt
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
