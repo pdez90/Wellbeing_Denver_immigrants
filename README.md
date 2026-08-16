@@ -134,6 +134,11 @@ is missing or constant, rather than fitting a reduced model, so an upstream join
 failure surfaces immediately instead of silently changing a reported
 specification.
 
+**Units.** NaNDA street connectivity measures are per square mile, not per
+square kilometre: `intdensity` is defined as `n_realnodes / tract_area_sqmiles`
+(ICPSR 38580, DS0003). Buffer-derived densities computed in scripts 03-05 are
+per square kilometre.
+
 **Random seed.** All bootstrap procedures draw from `WB_SEED` in `00_config.R`,
 so the mediation confidence intervals are exactly reproducible.
 
