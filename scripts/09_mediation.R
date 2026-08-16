@@ -28,30 +28,24 @@ context_z <- obj$context_z
 set.seed(WB_SEED)
 
 # -----------------------------------------------------------------------------
-# NOTE ON THE COVARIATE SET -- read before writing this up
+# Covariate set
 # -----------------------------------------------------------------------------
-# The mediation models adjust for a SMALLER set of covariates than the domain
-# models in 08. The categorical controls (gender, marital status, hispanic,
-# race, immigration status) are excluded, because a bootstrap resample can
-# produce a factor level with zero observations, which makes lm() fail inside
-# mediation::mediate().
+# The mediation models use the SAME confounder set as the domain models in
+# 08_domain_models.R, so Table 9 is directly comparable to Tables 4-8 and is
+# estimated on the same respondents.
 #
-# Consequence: mediation models run on n = 319 (or 249 where Tree Equity data
-# is missing), whereas the domain models run on n = 238-304, AND they adjust
-# for a different confounder set. The two sets of estimates are therefore not
-# directly comparable, and the paper must say so rather than presenting Table 8
-# as a continuation of Tables 4-6.
-#
-# If you want them comparable, the fix is to collapse the categorical controls
-# into numeric indicators (e.g. foreign_born_recent 0/1, partnered 0/1) that
-# survive resampling, and use the same set in both places.
+# This is possible because 08 collapses the categorical demographic controls
+# into binary indicators computed once on the full sample. Entered as factors,
+# their sparse levels (race cells of n = 2, 4, 5; immigration status cells of
+# 5 and 10) could be emptied by a bootstrap resample, which made lm() fail
+# inside mediation::mediate() and previously forced these controls to be
+# dropped from the mediation models.
 # -----------------------------------------------------------------------------
 
-med_covars <- c("age", "children", "income_hh", "edu_level", "engl_speak",
-                "time_live_denver", "time_live_hood", context_z)
+med_covars <- c(obj$individual_controls, context_z)
 med_covars <- med_covars[med_covars %in% names(model_dat)]
 
-cat("Mediation covariate set:\n  ", paste(med_covars, collapse = ", "), "\n\n")
+stopifnot(length(med_covars) == length(unique(med_covars)))
 
 predictor_labels <- c(
   walk_nat_walk_ind_z          = "EPA Walkability Index",
@@ -213,11 +207,11 @@ ft8 <- flextable::flextable(table8) %>%
     "effect. Indirect effects estimated using 1,000 nonparametric bootstrap simulations",
     sprintf("(seed = %d).", WB_SEED),
     "Continuous built-environment variables are standardized. Mediation models adjust for",
-    "age, number of children, household income, education, English proficiency, years in",
-    "Denver, years in neighborhood, and neighborhood socioeconomic context; unlike the",
-    "domain models in Tables 4-6 they do NOT adjust for gender, marital status, race,",
-    "ethnicity, or immigration status. Holm-adjusted p-values account for testing ten",
-    "indirect effects."
+    "the same covariate set as the domain models in Tables 4-8: age, number of children,",
+    "household income, education, English proficiency, years in the Denver metro area,",
+    "years in the current neighborhood, demographic indicators, and neighborhood",
+    "socioeconomic context. Holm-adjusted p-values account for testing ten indirect",
+    "effects."
   ))
 
 doc8 <- officer::read_docx() %>%

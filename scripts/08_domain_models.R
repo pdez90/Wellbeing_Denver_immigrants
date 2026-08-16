@@ -88,10 +88,58 @@ cat(sprintf(
 # 3. Covariates and domains
 # -----------------------------------------------------------------------------
 
+# ---- Demographic controls as stable binary indicators ------------------------
+# The categorical demographic variables are collapsed into binary indicators
+# computed once on the full sample, rather than entered as factors. Two reasons:
+#
+#   1. Several categories are very sparse -- race has cells of n = 2, 4 and 5;
+#      marital status has cells of 8 and 16; immigration status has cells of 5
+#      and 10. Bootstrap resampling in 09_mediation.R can draw a sample in which
+#      such a level is empty, which makes lm() fail. That is why the mediation
+#      models previously had to drop these controls entirely.
+#   2. As factors they spend 18 degrees of freedom, much of it on those sparse
+#      cells; as indicators they spend 7. On analytic samples of 238-320 that
+#      difference is material.
+#
+# Collapsing this way lets the domain models and the mediation models use an
+# IDENTICAL confounder set on IDENTICAL samples, so Table 9 is directly
+# comparable to Tables 4-8.
+#
+# NOTE: indicator names follow the raw survey response codes. Confirm the
+# substantive labels against the survey codebook and rename via
+# `demographic_labels` below before publication.
+
+demographic_labels <- c(
+  ind_gender_1   = "Gender (category 1)",
+  ind_marital_1  = "Marital status (category 1)",
+  ind_hispanic_1 = "Hispanic ethnicity",
+  ind_race_4     = "Race (modal category)",
+  ind_imm_1      = "Immigration status (category 1)",
+  ind_imm_2      = "Immigration status (category 2)",
+  ind_imm_other  = "Immigration status (other categories)"
+)
+
+dat <- dat %>%
+  dplyr::mutate(
+    ind_gender_1   = as.numeric(to_num(gender)     == 1),
+    ind_marital_1  = as.numeric(to_num(marital)    == 1),
+    ind_hispanic_1 = as.numeric(to_num(hispanic)   == 1),
+    ind_race_4     = as.numeric(to_num(race)       == 4),
+    ind_imm_1      = as.numeric(to_num(imm_status) == 1),
+    ind_imm_2      = as.numeric(to_num(imm_status) == 2),
+    ind_imm_other  = as.numeric(to_num(imm_status) %in% c(3, 4, 5, 6, 7))
+  )
+
+cat("\nDemographic indicator coverage:\n")
+for (v in names(demographic_labels)) {
+  cat(sprintf("  %-16s n = %3d of %d, mean = %.3f\n", v,
+              sum(!is.na(dat[[v]])), nrow(dat), mean(dat[[v]], na.rm = TRUE)))
+}
+
 individual_controls <- c(
-  "age", "gender", "marital", "children", "hispanic", "race",
-  "imm_status", "income_hh", "edu_level", "engl_speak",
-  "time_live_denver", "time_live_hood"
+  "age", "children", "income_hh", "edu_level", "engl_speak",
+  "time_live_denver", "time_live_hood",
+  names(demographic_labels)
 )
 
 context_vars <- c("pop_density", "housing_density", "dist_downtown_km",
@@ -157,6 +205,10 @@ dat <- dat %>%
 
 all_numeric_covars <- unique(c(context_vars, unlist(domain_vars)))
 
+# raw categorical survey columns, kept numeric only so the indicators above can
+# be built from them; they do not enter any model directly
+raw_categoricals <- c("gender", "marital", "hispanic", "race", "imm_status")
+
 dat <- dat %>%
   dplyr::mutate(
     dplyr::across(dplyr::any_of(c(individual_controls, all_numeric_covars)), to_num)
@@ -179,11 +231,6 @@ model_vars <- unique(c("swb_z", "belonging_z", individual_controls,
 model_dat <- dat %>%
   dplyr::select(dplyr::any_of(model_vars)) %>%
   dplyr::filter(!is.na(swb_z), !is.na(belonging_z))
-
-factor_controls <- intersect(c("gender", "marital", "hispanic", "race", "imm_status"),
-                             names(model_dat))
-model_dat <- model_dat %>%
-  dplyr::mutate(dplyr::across(dplyr::all_of(factor_controls), as.factor))
 
 keep_vars <- names(model_dat)[
   vapply(model_dat, function(x) dplyr::n_distinct(x, na.rm = TRUE) > 1, logical(1))

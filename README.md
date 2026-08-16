@@ -112,19 +112,22 @@ Sample sizes are reported in every table.
 
 **Greenness measures are collinear by construction.** The Tree Equity Score is
 derived from tree canopy cover, so `tree_tes` and `tree_treecanopy` correlate at
-r = .89, with variance inflation factors of 13.7 and 10.4.
+r = .89, with a maximum variance inflation factor of 13.4.
 `10_greenness_sensitivity.R` refits the greenness domain with each measure
 entered alone; the independently measured DRCOG land-cover canopy share is used
 as the primary greenness exposure. See §3.4 of the paper.
 
-**Mediation covariate set.** Mediation models adjust for age, number of
-children, household income, education, English proficiency, years in the Denver
-metro area, years in the current neighborhood, and neighborhood socioeconomic
-context. They do not include the categorical demographic controls used in the
-domain models, because bootstrap resampling can produce factor levels with no
-observations. Mediation estimates therefore rest on different samples
-(n = 249–319) and a different adjustment set than the domain models, and are not
-directly comparable to them. This is stated in §2.6 and in the Table 9 note.
+**Demographic controls.** The categorical demographic variables are collapsed
+into binary indicators computed once on the full sample rather than entered as
+factors. Several response categories are very sparse (race includes cells of 2,
+4, and 5; immigration status includes cells of 5 and 10), which both consumes
+degrees of freedom on analytic samples of 238–320 and makes bootstrap resampling
+unstable. Indicator names follow the raw survey response codes; see
+`demographic_labels` in `08_domain_models.R`.
+
+**Mediation covariate set.** The mediation models use the same covariate set and
+the same analytic samples as the domain models, so Table 9 is directly
+comparable to Tables 4–8.
 
 **Model specifications are strict.** `make_lm()` stops if a requested predictor
 is missing or constant, rather than fitting a reduced model, so an upstream join
