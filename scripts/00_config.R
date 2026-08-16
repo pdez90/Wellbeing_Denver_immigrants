@@ -214,4 +214,39 @@ make_lm <- function(outcome, rhs, data, allow_drop = FALSE) {
             data = data)
 }
 
+# -----------------------------------------------------------------------------
+# 5. Reproducibility
+# -----------------------------------------------------------------------------
+
+# Every stochastic step in this project -- the bootstrap resampling in
+# 09_mediation.R -- draws from this seed, so the reported confidence intervals
+# are exactly reproducible.
+WB_SEED <- 20260622
+set.seed(WB_SEED)
+
+# Record the exact R and package versions that produced a run.
+wb_write_session_info <- function(file = file.path(out_dir, "sessionInfo.txt")) {
+  writeLines(
+    c(paste("Run completed:", format(Sys.time(), tz = "UTC", usetz = TRUE)),
+      paste("Seed:", WB_SEED), "",
+      utils::capture.output(utils::sessionInfo())),
+    file
+  )
+  cat("Wrote", file, "\n")
+}
+
+# Fail early if a required raw input is missing, rather than producing a
+# silently empty join part-way through a long spatial script.
+wb_check_inputs <- function(...) {
+  paths <- c(...)
+  missing <- paths[!file.exists(file.path(out_dir, paths))]
+  if (length(missing)) {
+    stop("Missing required input(s) in ", out_dir, ":\n  - ",
+         paste(missing, collapse = "\n  - "),
+         "\nSee DATA_MANIFEST.md for where each file comes from.",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 cat("Config loaded. out_dir =", out_dir, "\n")
