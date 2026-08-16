@@ -105,58 +105,50 @@ cat(sprintf(
 # IDENTICAL confounder set on IDENTICAL samples, so Table 9 is directly
 # comparable to Tables 4-8.
 #
-# LABELS. The survey export stores these variables as integer codes with no
-# value labels. The labels below were inferred from the question wording and
-# from the "other, please specify" free-text columns in swb_data.csv:
+# CODES. Taken from the "Meta-data" sheet of SWB Analysis Copy (1).xlsx, the
+# codebook supplied with the survey. Note two conventions that are easy to get
+# wrong:
 #
-#   Q3.6 race, code 4 (n = 304): 102 respondents also entered free text, giving
-#     "Latino", "Mexicana", "East Indian", "Arab" and similar. Code 4 is
-#     therefore the OTHER / SELF-DESCRIBED category, not a listed race group.
-#     Five of six standard race categories together account for 62 respondents.
-#   Q3.7 immigration status, code 0 (n = 89): free text "Citizen", "Ciudadano",
-#     "US Citizenship through one of my parents at birth" -> US CITIZEN.
-#   Q3.7 code 1 (n = 111): "residencia", "Recidente" -> PERMANENT RESIDENT.
-#   Q3.7 code 2 (n = 92): "Nada", "fighting deportation", "Proceso" ->
-#     UNDOCUMENTED or status pending.
-#   Q3.7 code 3 (n = 13): "DACA". Code 7 (n = 30): temporary visas ("J1",
-#     "visa de turista"). Codes 4-6 (n = 32): unlabelled, small cells.
-#   Q3.5 hispanic: "Do you consider yourself to be Hispanic?", 1 = yes.
+#   Q3.5 Hispanic is coded Yes = 0, No = 1. The indicator below is therefore
+#     built from `hispanic == 0`, not == 1. 70.4% of the sample is Hispanic.
+#   Q3.6 Race: African American = 0, Pacific Islander/Filipino/Hawaiian = 1,
+#     Asian = 2, Native American = 3, White = 4, Other = 5. 83.1% selected
+#     White. (Many respondents coded White also left text in the "other,
+#     specify" box naming a national origin -- orphaned Qualtrics text from an
+#     earlier selection. It does not change the coding.)
+#   Q3.7 Immigration status: Naturalized citizen = 0, green card / lawful
+#     permanent resident = 1, no official status (undocumented) = 2, DACA = 3,
+#     student visa = 4, refugee = 5, asylee = 6, work visa = 7.
 #
-# Gender (Q3.2, codes 0/1) and marital status (codes 0-4) could NOT be resolved
-# from the export: no respondent used the free-text option. Confirm both against
-# the questionnaire before publication.
+# Immigration status is represented by three indicators against a naturalized-
+# citizen reference. Codes 3-7 are merged because each has 5 to 30 respondents;
+# they are all temporary or protected statuses short of permanent residence.
 
 demographic_labels <- c(
-  ind_gender_1   = "Gender category 1 [CONFIRM which category]",
-  ind_marital_1  = "Marital status category 1, 65% of sample [CONFIRM: likely married/partnered]",
-  ind_hispanic_1 = "Hispanic ethnicity",
-  ind_race_4     = "Race: other / self-described",
-  ind_imm_1      = "Permanent resident",
-  ind_imm_2      = "Undocumented or status pending",
-  ind_imm_other  = "DACA, temporary visa, or other status"
+  ind_female        = "Female",
+  ind_married       = "Married",
+  ind_hispanic      = "Hispanic",
+  ind_race_white    = "Race: White",
+  ind_lpr           = "Lawful permanent resident",
+  ind_undocumented  = "No official status (undocumented)",
+  ind_imm_other     = "DACA, student/work visa, refugee, or asylee"
 )
-
-# Reference category for the immigration-status indicators is code 0, US
-# citizen. The three indicators plus the reference reproduce the substantive
-# distinction that matters most in this literature -- citizen / permanent
-# resident / undocumented / temporary -- while merging cells of 5 to 17
-# respondents that a bootstrap resample could otherwise empty.
 
 dat <- dat %>%
   dplyr::mutate(
-    ind_gender_1   = as.numeric(to_num(gender)     == 1),
-    ind_marital_1  = as.numeric(to_num(marital)    == 1),
-    ind_hispanic_1 = as.numeric(to_num(hispanic)   == 1),
-    ind_race_4     = as.numeric(to_num(race)       == 4),
-    ind_imm_1      = as.numeric(to_num(imm_status) == 1),
-    ind_imm_2      = as.numeric(to_num(imm_status) == 2),
-    ind_imm_other  = as.numeric(to_num(imm_status) %in% c(3, 4, 5, 6, 7))
+    ind_female       = as.numeric(to_num(gender)     == 1),
+    ind_married      = as.numeric(to_num(marital)    == 1),
+    ind_hispanic     = as.numeric(to_num(hispanic)   == 0),   # Yes = 0
+    ind_race_white   = as.numeric(to_num(race)       == 4),
+    ind_lpr          = as.numeric(to_num(imm_status) == 1),
+    ind_undocumented = as.numeric(to_num(imm_status) == 2),
+    ind_imm_other    = as.numeric(to_num(imm_status) %in% c(3, 4, 5, 6, 7))
   )
 
 cat("\nDemographic indicator coverage:\n")
 for (v in names(demographic_labels)) {
-  cat(sprintf("  %-16s n = %3d of %d, mean = %.3f\n", v,
-              sum(!is.na(dat[[v]])), nrow(dat), mean(dat[[v]], na.rm = TRUE)))
+  cat(sprintf("  %-17s %-44s n = %3d, mean = %.3f\n", v, demographic_labels[[v]],
+              sum(!is.na(dat[[v]])), mean(dat[[v]], na.rm = TRUE)))
 }
 
 individual_controls <- c(
