@@ -105,19 +105,42 @@ cat(sprintf(
 # IDENTICAL confounder set on IDENTICAL samples, so Table 9 is directly
 # comparable to Tables 4-8.
 #
-# NOTE: indicator names follow the raw survey response codes. Confirm the
-# substantive labels against the survey codebook and rename via
-# `demographic_labels` below before publication.
+# LABELS. The survey export stores these variables as integer codes with no
+# value labels. The labels below were inferred from the question wording and
+# from the "other, please specify" free-text columns in swb_data.csv:
+#
+#   Q3.6 race, code 4 (n = 304): 102 respondents also entered free text, giving
+#     "Latino", "Mexicana", "East Indian", "Arab" and similar. Code 4 is
+#     therefore the OTHER / SELF-DESCRIBED category, not a listed race group.
+#     Five of six standard race categories together account for 62 respondents.
+#   Q3.7 immigration status, code 0 (n = 89): free text "Citizen", "Ciudadano",
+#     "US Citizenship through one of my parents at birth" -> US CITIZEN.
+#   Q3.7 code 1 (n = 111): "residencia", "Recidente" -> PERMANENT RESIDENT.
+#   Q3.7 code 2 (n = 92): "Nada", "fighting deportation", "Proceso" ->
+#     UNDOCUMENTED or status pending.
+#   Q3.7 code 3 (n = 13): "DACA". Code 7 (n = 30): temporary visas ("J1",
+#     "visa de turista"). Codes 4-6 (n = 32): unlabelled, small cells.
+#   Q3.5 hispanic: "Do you consider yourself to be Hispanic?", 1 = yes.
+#
+# Gender (Q3.2, codes 0/1) and marital status (codes 0-4) could NOT be resolved
+# from the export: no respondent used the free-text option. Confirm both against
+# the questionnaire before publication.
 
 demographic_labels <- c(
-  ind_gender_1   = "Gender (category 1)",
-  ind_marital_1  = "Marital status (category 1)",
+  ind_gender_1   = "Gender category 1 [CONFIRM which category]",
+  ind_marital_1  = "Marital status category 1, 65% of sample [CONFIRM: likely married/partnered]",
   ind_hispanic_1 = "Hispanic ethnicity",
-  ind_race_4     = "Race (modal category)",
-  ind_imm_1      = "Immigration status (category 1)",
-  ind_imm_2      = "Immigration status (category 2)",
-  ind_imm_other  = "Immigration status (other categories)"
+  ind_race_4     = "Race: other / self-described",
+  ind_imm_1      = "Permanent resident",
+  ind_imm_2      = "Undocumented or status pending",
+  ind_imm_other  = "DACA, temporary visa, or other status"
 )
+
+# Reference category for the immigration-status indicators is code 0, US
+# citizen. The three indicators plus the reference reproduce the substantive
+# distinction that matters most in this literature -- citizen / permanent
+# resident / undocumented / temporary -- while merging cells of 5 to 17
+# respondents that a bootstrap resample could otherwise empty.
 
 dat <- dat %>%
   dplyr::mutate(
