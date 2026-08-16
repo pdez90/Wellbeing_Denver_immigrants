@@ -1,8 +1,7 @@
 # ---------------------------------------------------------------------------
-# NO DATA IN THIS REPOSITORY.
-# The survey contains approximate residential coordinates for 381 foreign-born
-# respondents and is not redistributable. Third-party spatial datasets are
-# large and separately licensed. See DATA_MANIFEST.md for sources.
+# No data is tracked in this repository. The survey contains approximate
+# residential locations and is not publicly redistributable; the third-party
+# spatial datasets are large and separately licensed. See DATA_MANIFEST.md.
 # ---------------------------------------------------------------------------
 data/
 *.csv
@@ -39,3 +38,6 @@ sessionInfo.txt
 .Rhistory
 .RData
 .Ruserdata
+
+# renv lockfile is tracked
+!renv.lock

@@ -44,41 +44,31 @@ Total on-disk size is roughly 9 GB, dominated by the DRCOG land-cover raster.
 | `seg_poi.csv` | 05 | Experienced segregation / POI travel dataset, 94 MB. See caution below. |
 | `diversity_CO.csv` | 05 | Residential and experienced diversity, Colorado. |
 
-## Caution: `seg_poi.csv`
+## Note on `seg_poi.csv`
 
 The column layout is `cbgid`, `All_segregation`, `All_distance`, `race`,
 `median_household_income`, `classification`, `residential_segregation`, then a
-`*_segregation` / `*_distance` pair for each of 16 POI categories (Culture,
-Entertainment, Grocery, Healthcare, Hospital, Hotel, LifeService, market, park,
-personalcare, religious, restaurant, school, socialassistance, sport,
-storeshopping).
+`*_segregation` / `*_distance` pair for each of 16 point-of-interest categories
+(Culture, Entertainment, Grocery, Healthcare, Hospital, Hotel, LifeService,
+market, park, personalcare, religious, restaurant, school, socialassistance,
+sport, storeshopping).
 
-The `*_distance` columns average 39–85 with a maximum of 461. That is not a
-home-to-nearest-destination distance, and the pairing with `*_segregation`
-indicates these are **average travel distances of visits** to that POI
-category by residents of the block group — a mobility measure derived from
-mobile-device traces, not a built-environment proximity measure.
+The `*_distance` columns are average travel distances to visited destinations in
+each category, not home-to-nearest-destination proximity: values average 39–85
+with a maximum of 461, and each is paired one-to-one with a `*_segregation`
+column from the same source. Consult the source codebook before using them.
 
-Methods §2.4 currently describes them as "proximity to grocery stores, schools,
-healthcare facilities, parks, and other destinations using SafeGraph points of
-interest datasets." **Confirm the units and definition against the source
-codebook before keeping that sentence.** Nothing in the currently published
-results depends on these columns — no `segpoi_*` variable enters any reported
-model — so this is a Methods-text problem, not a results problem, unless you
-choose to model them.
+No `segpoi_*` variable enters any model reported in the paper. Script 05 merges
+these columns and retains them in the analysis file for future work.
 
-## Files in the data folder that are NOT pipeline inputs
+## Files written by the pipeline
 
-Outputs of previous runs, kept for comparison. Safe to delete; they will be
-regenerated.
+The scripts write their outputs into the same folder as the inputs. These are
+regenerated on each run and do not need to be retained:
 
 `respondents_with_*.csv`, `landcover_*_long.csv`, `model_data_*.csv`,
-`formal_mediation_results*.csv`, `Table*_*.docx`, `domain_models_*.html`,
-`swb_*.html`, `maps_outputs/`, `word_ready_tables/`, `word_ready_model_tables/`
-
-Stale outputs from the archived perceived-environment analysis, which the paper
-should **not** cite: `Table1_Descriptive_Statistics.docx`,
-`Table2_Model_Results.docx`, `Table3_Mediation_Results.docx`,
-`swb_model_results.html`, `sem_mediation_results.csv`,
-`model1_built_environment_swb.csv`, `model2_built_environment_belonging.csv`,
-`model3_belonging_swb.csv`, `model_data_cleaned.csv`, `SWB_Word_Ready_Tables.docx`.
+`all_model_coefficients.csv`, `model_fit_summary.csv`, `vif_diagnostics.csv`,
+`zoning_joint_tests.csv`, `greenness_sensitivity.*`,
+`formal_mediation_results*.csv`, `Table*_*.docx`, `domain_models_*`,
+`maps_outputs/`, `word_ready_tables/`, `word_ready_model_tables/`,
+`sessionInfo.txt`.

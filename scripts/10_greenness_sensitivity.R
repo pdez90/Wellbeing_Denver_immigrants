@@ -53,7 +53,7 @@ specs <- list(
 
 fit_spec <- function(outcome, greenness_vars) {
   make_lm(outcome, unique(c(individual_controls, context_z, greenness_vars)),
-          model_dat, verbose = FALSE)
+          model_dat)
 }
 
 max_green_vif <- function(m, greenness_vars) {

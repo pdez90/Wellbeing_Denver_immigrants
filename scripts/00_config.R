@@ -94,11 +94,28 @@ wb_packages_analysis <- c(
   "modelsummary", "mediation", "flextable", "officer"
 )
 
+# Package versions are pinned in renv.lock. The intended workflow is:
+#
+#   install.packages("renv")
+#   renv::restore()      # installs the exact versions used for the paper
+#
+# wb_require() then simply attaches them. If renv has not been restored and a
+# package is genuinely absent, it stops with instructions rather than silently
+# installing whatever version CRAN serves today -- which is what makes results
+# drift over time.
 wb_require <- function(pkgs) {
   missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
   if (length(missing)) {
-    message("Installing missing packages: ", paste(missing, collapse = ", "))
-    install.packages(missing)
+    stop(
+      "Missing packages: ", paste(missing, collapse = ", "), "\n\n",
+      "This project pins package versions with renv. To install them:\n",
+      "    install.packages(\"renv\")\n",
+      "    renv::restore()\n\n",
+      "To install the current CRAN versions instead (results may differ from\n",
+      "those reported in the paper):\n",
+      "    install.packages(c(", paste0("\"", missing, "\"", collapse = ", "), "))",
+      call. = FALSE
+    )
   }
   invisible(lapply(pkgs, library, character.only = TRUE))
 }
@@ -154,94 +171,47 @@ prefix_except <- function(df, prefix, keep = "geoid") {
 
 buffer_area_km2 <- function(buffer_m) pi * buffer_m^2 / 1e6
 
-# Fit lm() defensively: drop requested predictors that are absent from the
-# data or constant, so a missing join column degrades the model instead of
-# throwing. Prints what it dropped -- silence here would hide real problems.
-make_lm <- function(outcome, rhs, data, verbose = TRUE) {
+# Fit lm(), failing loudly if any requested predictor is missing or constant.
+#
+# A model in the manuscript specifies an exact set of predictors. If one of them
+# vanishes -- because an upstream join silently failed, or a column was renamed
+# -- the correct behaviour for archival code is to stop, not to quietly fit a
+# smaller model that still looks plausible. `allow_drop = TRUE` restores the
+# permissive behaviour, and is used only where a specification is deliberately
+# probing which variables exist (never for a reported model).
+make_lm <- function(outcome, rhs, data, allow_drop = FALSE) {
+
   requested <- rhs
-  rhs <- rhs[rhs %in% names(data)]
-  absent <- setdiff(requested, rhs)
-  rhs <- rhs[vapply(data[rhs], function(x) dplyr::n_distinct(x, na.rm = TRUE) > 1, logical(1))]
-  constant <- setdiff(setdiff(requested, absent), rhs)
-  if (verbose && length(c(absent, constant))) {
-    message(
-      "  make_lm(", outcome, "): dropped ",
-      if (length(absent))   paste0("[absent: ",   paste(absent,   collapse = ", "), "] ") else "",
-      if (length(constant)) paste0("[constant: ", paste(constant, collapse = ", "), "]")  else ""
+  absent    <- setdiff(requested, names(data))
+  present   <- setdiff(requested, absent)
+  constant  <- present[!vapply(data[present],
+                               function(x) dplyr::n_distinct(x, na.rm = TRUE) > 1,
+                               logical(1))]
+
+  if (length(c(absent, constant)) && !allow_drop) {
+    stop(
+      "make_lm(", outcome, "): refusing to fit a model that is missing predictors.\n",
+      if (length(absent))
+        paste0("  Not present in the data: ", paste(absent, collapse = ", "), "\n") else "",
+      if (length(constant))
+        paste0("  Present but constant:    ", paste(constant, collapse = ", "), "\n") else "",
+      "  This usually means an upstream join failed. Check the script that\n",
+      "  produces the input file before re-running. To fit anyway (not for a\n",
+      "  reported model), pass allow_drop = TRUE.",
+      call. = FALSE
     )
   }
-  f <- stats::as.formula(paste(outcome, "~", paste(rhs, collapse = " + ")))
-  stats::lm(f, data = data)
-}
 
-# -----------------------------------------------------------------------------
-# 5. Reproducibility
-# -----------------------------------------------------------------------------
-# Every stochastic step in this project (bootstrap resampling in 09_mediation.R)
-# draws from this seed. Changing it changes the mediation confidence intervals
-# in the third decimal place; it does not change any conclusion.
-WB_SEED <- 20260622
-set.seed(WB_SEED)
-
-# Write the exact package versions used for a run, so a reviewer can see what
-# produced the numbers. Called at the end of run_all.R.
-wb_write_session_info <- function(file = file.path(out_dir, "sessionInfo.txt")) {
-  writeLines(
-    c(paste("Run completed:", format(Sys.time(), tz = "UTC", usetz = TRUE)),
-      paste("Seed:", WB_SEED), "",
-      utils::capture.output(utils::sessionInfo())),
-    file
-  )
-  cat("Wrote", file, "\n")
-}
-
-# Locate pandoc. Writing .docx from modelsummary/flextable needs it, and R
-# started from the terminal does not inherit the copy bundled with RStudio or
-# Quarto. Look in the usual places and point R at whatever we find. Returns
-# TRUE if a usable pandoc is available.
-wb_find_pandoc <- function(quiet = FALSE) {
-  if (nzchar(Sys.getenv("RSTUDIO_PANDOC")) &&
-      file.exists(file.path(Sys.getenv("RSTUDIO_PANDOC"), "pandoc"))) return(TRUE)
-  if (nzchar(Sys.which("pandoc"))) return(TRUE)
-
-  candidates <- c(
-    "/Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools",
-    "/Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/aarch64",
-    "/Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/x86_64",
-    "/Applications/RStudio.app/Contents/MacOS/quarto/bin/tools",
-    "/Applications/quarto/bin/tools",
-    "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin",
-    "/Applications/RStudio.app/Contents/MacOS/pandoc"
-  )
-  hit <- candidates[file.exists(file.path(candidates, "pandoc"))]
-  if (length(hit)) {
-    Sys.setenv(RSTUDIO_PANDOC = hit[1])
-    Sys.setenv(PATH = paste(hit[1], Sys.getenv("PATH"), sep = .Platform$path.sep))
-    if (!quiet) cat("Found pandoc at", hit[1], "\n")
-    return(TRUE)
+  if (length(c(absent, constant))) {
+    message("  make_lm(", outcome, "): dropped ",
+            paste(c(absent, constant), collapse = ", "), " (allow_drop = TRUE)")
   }
-  if (!quiet) {
-    message(
-      "pandoc not found. HTML and CSV outputs will still be written; .docx ",
-      "tables will be skipped.\n  To enable .docx output: brew install pandoc"
-    )
-  }
-  FALSE
-}
 
-WB_HAS_PANDOC <- wb_find_pandoc(quiet = TRUE)
+  keep <- setdiff(present, constant)
+  if (!length(keep)) stop("make_lm(", outcome, "): no usable predictors.", call. = FALSE)
 
-# Fail loudly and early if a required raw input is missing, rather than
-# producing a silently-empty join twenty minutes into a spatial script.
-wb_check_inputs <- function(...) {
-  paths <- c(...)
-  missing <- paths[!file.exists(file.path(out_dir, paths))]
-  if (length(missing)) {
-    stop("Missing required input(s) in ", out_dir, ":\n  - ",
-         paste(missing, collapse = "\n  - "),
-         "\nSee DATA_MANIFEST.md for where each file comes from.")
-  }
-  invisible(TRUE)
+  stats::lm(stats::as.formula(paste(outcome, "~", paste(keep, collapse = " + "))),
+            data = data)
 }
 
 cat("Config loaded. out_dir =", out_dir, "\n")

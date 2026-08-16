@@ -283,8 +283,8 @@ print(model_fit, n = 30)
 cat("\n== Joint significance of zoning category ==\n")
 zoning_tests <- purrr::map_dfr(c("swb_z", "belonging_z"), function(outcome) {
   rhs_full <- unique(c(individual_controls, context_z, domain_z$land_use))
-  full <- make_lm(outcome, rhs_full, model_dat, verbose = FALSE)
-  red  <- make_lm(outcome, setdiff(rhs_full, "zone_category"), model_dat, verbose = FALSE)
+  full <- make_lm(outcome, rhs_full, model_dat)
+  red  <- make_lm(outcome, setdiff(rhs_full, "zone_category"), model_dat)
   a <- stats::anova(red, full)
   tibble::tibble(outcome = outcome, df = a$Df[2], resid_df = a$Res.Df[2],
                  F = a$`F`[2], p = a$`Pr(>F)`[2])
