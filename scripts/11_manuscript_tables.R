@@ -240,7 +240,11 @@ specs <- list(
 max_green_vif <- function(m, gv) {
   v <- try(car::vif(m), silent = TRUE); if (inherits(v, "try-error")) return(NA_real_)
   vv <- if (is.matrix(v)) stats::setNames(v[, "GVIF"]^(1 / v[, "Df"]), rownames(v)) else stats::setNames(as.numeric(v), names(v))
-  hit <- vv[names(vv) %in% gv]; if (!length(hit)) NA_real_ else max(hit)^2
+  # car::vif() already returns the variance inflation factor for single-df
+  # terms, and the matrix branch above has converted GVIF to the comparable
+  # scale. Squaring it here was a bug: it reported 179.3 where 08_domain_models.R
+  # reports 13.4 for the same model.
+  hit <- vv[names(vv) %in% gv]; if (!length(hit)) NA_real_ else max(hit)
 }
 rows10 <- list()
 for (oc in c("belonging_z", "swb_z")) for (nm in names(specs)) {
