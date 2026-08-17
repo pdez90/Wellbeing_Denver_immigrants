@@ -87,9 +87,16 @@ scalebar <- function(x, len_km = 10) {
   text(x0 + len_km * 500, y0, sprintf("%d km", len_km), pos = 3, cex = 0.6, col = INK)
 }
 
-legend_box <- function(labels, fills, title, cex = 0.62) {
-  legend("bottomright", legend = labels, fill = fills, border = EDGE,
-         bty = "n", cex = cex, title = title, title.adj = 0, inset = c(0.01, 0.02))
+# The plot region is taller than the map when the aspect is fixed, so
+# legend("bottomright") lands under the map rather than inside it. Position the
+# legend in map coordinates instead.
+legend_box <- function(ext, labels, fills, title, cex = 0.62,
+                       at = c(0.99, 0.02)) {
+  bb <- sf::st_bbox(ext)
+  legend(x = bb[["xmin"]] + at[1] * (bb[["xmax"]] - bb[["xmin"]]),
+         y = bb[["ymin"]] + at[2] * (bb[["ymax"]] - bb[["ymin"]]),
+         xjust = 1, yjust = 0, legend = labels, fill = fills, border = EDGE,
+         bty = "n", cex = cex, title = title, title.adj = 0)
 }
 
 # =============================================================================
@@ -117,7 +124,7 @@ readr::write_csv(
   file.path(fig_dir, "si_map_counts_by_tract.csv"))
 
 draw_s10 <- function() {
-  par(mfrow = c(1, 2), mar = c(0.5, 0.5, 3.2, 0.5), family = "serif")
+  par(mfrow = c(1, 2), mar = c(0.3, 0.3, 2.6, 0.3), family = "serif")
 
   # (a) Colorado, metro highlighted
   frame(co, "a.  Study area", "six-county Denver metropolitan area within Colorado")
@@ -125,14 +132,14 @@ draw_s10 <- function() {
   plot(sf::st_geometry(metro), col = "#C8D8DF", border = "#5B7185", lwd = 0.8, add = TRUE)
 
   # (b) respondents per tract
-  frame(tr_study, "b.  Survey respondents per census tract",
+  frame(metro, "b.  Survey respondents per census tract",
         sprintf("%d respondents across %d tracts; individual homes are not mapped",
                 sum(tr_study$respondents), sum(tr_study$respondents > 0)))
   plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.5, add = TRUE)
   plot(sf::st_geometry(tr_study), col = tr_study$fill, border = "#FFFFFF", lwd = 0.25, add = TRUE)
   plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.8, add = TRUE)
-  legend_box(brk_lab, fills, "Respondents")
-  scalebar(tr_study)
+  legend_box(metro, brk_lab, fills, "Respondents")
+  scalebar(metro)
 }
 
 grDevices::png(file.path(fig_dir, "Figure_S10_respondents.png"),
@@ -168,11 +175,11 @@ collapse_zone <- function(x) {
 }
 zon$cat <- collapse_zone(zon[[zcol]])
 zon <- sf::st_make_valid(zon)
-zon_study <- suppressWarnings(sf::st_crop(zon, sf::st_bbox(sf::st_buffer(tr_study, 1500))))
+zon_study <- suppressWarnings(sf::st_crop(zon, sf::st_bbox(metro)))
 
 draw_s11 <- function() {
-  par(mar = c(0.5, 0.5, 3.2, 0.5), family = "serif")
-  frame(tr_study, "Generalized zoning across the study area",
+  par(mar = c(0.3, 0.3, 2.6, 0.3), family = "serif")
+  frame(metro, "Generalized zoning across the study area",
         "parcel zoning collapsed into the four categories entered in the land use models")
   plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.5, add = TRUE)
   plot(sf::st_geometry(zon_study), col = ifelse(is.na(zon_study$cat), "#EFEFEF",
@@ -180,8 +187,9 @@ draw_s11 <- function() {
        border = NA, add = TRUE)
   plot(sf::st_geometry(tr_study), col = NA, border = "#FFFFFF", lwd = 0.2, add = TRUE)
   plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.8, add = TRUE)
-  legend_box(c(names(ZCOL), "not classified"), c(unname(ZCOL), "#EFEFEF"), "Zoning category")
-  scalebar(tr_study)
+  legend_box(metro, c(names(ZCOL), "not classified"), c(unname(ZCOL), "#EFEFEF"),
+             "Zoning category")
+  scalebar(metro)
 }
 
 grDevices::png(file.path(fig_dir, "Figure_S11_zoning.png"),
@@ -197,7 +205,7 @@ draw_s11(); grDevices::dev.off()
 # buffer-derived exposures are specific to each respondent's home and have no
 # areal footprint; they are described in Tables S2 to S12 instead.
 AREA_VARS <- list(
-  list(col = "pop_density",       geo = "tract", lab = "Population density",        unit = "persons/km2"),
+  list(col = "pop_density",       geo = "tract", lab = "Population density",        unit = "persons per sq km"),
   list(col = "pct_poverty",       geo = "tract", lab = "Population below poverty",  unit = "%"),
   list(col = "pct_non_native",    geo = "tract", lab = "Foreign-born population",   unit = "%"),
   list(col = "walk_nat_walk_ind", geo = "bg",    lab = "EPA National Walkability Index", unit = "index"),
@@ -219,20 +227,19 @@ quantile_fill <- function(v, n = 5) {
 }
 
 draw_s12 <- function() {
-  par(mfrow = c(2, 3), mar = c(0.4, 0.4, 3.0, 0.4), family = "serif")
+  par(mfrow = c(2, 3), mar = c(0.3, 0.3, 2.6, 0.3), family = "serif")
   for (v in AREA_VARS) {
     g   <- if (v$geo == "tract") tr_study else bg_study
     key <- if (v$geo == "tract") "tract_geoid" else "bg_geoid"
     val <- tapply(suppressWarnings(as.numeric(dat[[v$col]])), dat[[key]], mean, na.rm = TRUE)
     g$val <- as.numeric(val[match(g$GEOID, names(val))])
     q <- quantile_fill(g$val)
-    frame(g, v$lab, sprintf("%s, by census %s", v$unit,
-                            ifelse(v$geo == "tract", "tract", "block group")))
+    frame(metro, v$lab, sprintf("%s, by census %s", v$unit,
+                                ifelse(v$geo == "tract", "tract", "block group")))
     plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.4, add = TRUE)
     plot(sf::st_geometry(g), col = q$fill, border = "#FFFFFF", lwd = 0.2, add = TRUE)
     plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.6, add = TRUE)
-    legend("bottomright", legend = q$labs, fill = q$pal, border = EDGE,
-           bty = "n", cex = 0.55, inset = c(0.01, 0.02))
+    legend_box(metro, q$labs, q$pal, NULL, cex = 0.55)
   }
 }
 

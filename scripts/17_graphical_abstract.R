@@ -161,8 +161,10 @@ draw <- function() {
 
   arrows(108.5, 79, 120.5, 70.5, length = 0.09, angle = 20, col = SWBCOL, lwd = 2.2)
   arrows(108.5, 44, 120.5, 41.0, length = 0.09, angle = 20, col = BELCOL, lwd = 2.2)
-  arrows(134, 35.0, 134, 63.0, length = 0.10, angle = 20, col = BELCOL, lwd = 2.8)
-  blab(140.5, 49, "", belg, cex = 0.8, col = BELCOL)
+  # from the top edge of the belonging box to the bottom edge of the well-being
+  # box, so the shaft does not run through either rectangle
+  arrows(134, 44.9, 134, 63.2, length = 0.10, angle = 20, col = BELCOL, lwd = 2.8)
+  blab(141.5, 54, "", belg, cex = 0.8, col = BELCOL)
 
   # the compound route the data do not support
   lines(c(108.5, 114, 119), c(47.5, 53, 58), col = "#9A9A9A", lwd = 1.2, lty = 3)
