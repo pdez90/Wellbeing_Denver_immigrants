@@ -87,9 +87,16 @@ scalebar <- function(x, len_km = 10) {
   text(x0 + len_km * 500, y0, sprintf("%d km", len_km), pos = 3, cex = 0.6, col = INK)
 }
 
-legend_box <- function(labels, fills, title, cex = 0.62) {
-  legend("bottomright", legend = labels, fill = fills, border = EDGE,
-         bty = "n", cex = cex, title = title, title.adj = 0, inset = c(0.01, 0.02))
+# The plot region is taller than the map when the aspect is fixed, so
+# legend("bottomright") lands under the map rather than inside it. Position the
+# legend in map coordinates instead.
+legend_box <- function(ext, labels, fills, title, cex = 0.62,
+                       at = c(0.99, 0.02)) {
+  bb <- sf::st_bbox(ext)
+  legend(x = bb[["xmin"]] + at[1] * (bb[["xmax"]] - bb[["xmin"]]),
+         y = bb[["ymin"]] + at[2] * (bb[["ymax"]] - bb[["ymin"]]),
+         xjust = 1, yjust = 0, legend = labels, fill = fills, border = EDGE,
+         bty = "n", cex = cex, title = title, title.adj = 0)
 }
 
 # =============================================================================
@@ -131,7 +138,7 @@ draw_s10 <- function() {
   plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.5, add = TRUE)
   plot(sf::st_geometry(tr_study), col = tr_study$fill, border = "#FFFFFF", lwd = 0.25, add = TRUE)
   plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.8, add = TRUE)
-  legend_box(brk_lab, fills, "Respondents")
+  legend_box(metro, brk_lab, fills, "Respondents")
   scalebar(metro)
 }
 
@@ -168,7 +175,7 @@ collapse_zone <- function(x) {
 }
 zon$cat <- collapse_zone(zon[[zcol]])
 zon <- sf::st_make_valid(zon)
-zon_study <- suppressWarnings(sf::st_crop(zon, sf::st_bbox(sf::st_buffer(tr_study, 1500))))
+zon_study <- suppressWarnings(sf::st_crop(zon, sf::st_bbox(metro)))
 
 draw_s11 <- function() {
   par(mar = c(0.3, 0.3, 2.6, 0.3), family = "serif")
@@ -180,7 +187,8 @@ draw_s11 <- function() {
        border = NA, add = TRUE)
   plot(sf::st_geometry(tr_study), col = NA, border = "#FFFFFF", lwd = 0.2, add = TRUE)
   plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.8, add = TRUE)
-  legend_box(c(names(ZCOL), "not classified"), c(unname(ZCOL), "#EFEFEF"), "Zoning category")
+  legend_box(metro, c(names(ZCOL), "not classified"), c(unname(ZCOL), "#EFEFEF"),
+             "Zoning category")
   scalebar(metro)
 }
 
@@ -231,8 +239,7 @@ draw_s12 <- function() {
     plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.4, add = TRUE)
     plot(sf::st_geometry(g), col = q$fill, border = "#FFFFFF", lwd = 0.2, add = TRUE)
     plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.6, add = TRUE)
-    legend("bottomright", legend = q$labs, fill = q$pal, border = EDGE,
-           bty = "n", cex = 0.55, inset = c(0.01, 0.02))
+    legend_box(metro, q$labs, q$pal, NULL, cex = 0.55)
   }
 }
 
