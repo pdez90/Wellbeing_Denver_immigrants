@@ -80,6 +80,8 @@ Each script reads the previous script's output. Run them in order.
 | 14 | `14_figure_coefficients.R` | Figure 2, every adjusted association on one pair of axes | 08 output | `figures/Figure2_Coefficients.png/.pdf/.csv` |
 | 15 | `15_buffer_sensitivity.R` | Refits every domain containing buffer measures at 400 m and 1,600 m, sample and all other terms held fixed | 08 output | `buffer_sensitivity.csv`, `buffer_sensitivity_wide.csv` |
 | 16 | `16_robustness.R` | Common-sample refit, cluster-robust and Conley spatial standard errors, robust MM-estimator, and the well-being scale without the overlapping item | 08 output | `robustness_common_sample.csv`, `robustness_standard_errors.csv`, `robustness_robust_regression.csv`, `robustness_swb_leave_one_out.csv` |
+| 17 | `17_graphical_abstract.R` | One-page visual summary of every model, its headline estimates and the robustness checks | 08, 09, 15, 16 output | `figures/Graphical_Abstract.png/.pdf` |
+| 18 | `18_si_maps.R` | SI maps: respondent counts by tract, generalized zoning, and the area-level model measures | 05 output, zoning shapefile, tigris | `figures/Figure_S10–S12.png/.pdf` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
@@ -117,11 +119,15 @@ main text and moves the rest to the Supplementary Information:
 | Table 1 | Sample characteristics and outcome variables | 11 |
 | Figure 1 | Mediation model estimated for each exposure | 12 |
 | Figure 2 | All adjusted associations, both outcomes | 14 |
-| Table 2 | Final parsimonious models | 11 |
-| Table 3 | Formal causal mediation analyses | 09, 11 |
+| Table 2 | Integrated models | 11 |
+| Table 3 | Mediation analyses | 09, 11 |
 | SI Section S1, Tables S1–S13, Figures S1–S9 | Descriptives for every analysis variable | 11 (Table S1), 13 |
 | SI Section S2, Tables S14–S15, S17–S19 | Full model output | 11 |
 | SI Table S16 | Greenness specification sensitivity | 10, 11 |
+| SI Table S20 | Buffer radius sensitivity | 15 |
+| SI Section S3, Tables S21–S24 | Robustness checks | 16 |
+| Graphical abstract | One-page summary of every model | 17 |
+| SI Figures S10–S12 | Study area and respondents, zoning, area-level measures | 18 |
 
 ---
 
@@ -160,8 +166,8 @@ Reference categories are never married and naturalized U.S. citizen. See
 `demographic_labels` in `08_domain_models.R`.
 
 **Mediation covariate set.** The mediation models use the same covariate set and
-the same analytic samples as the domain models, so Table 9 is directly
-comparable to Tables 4–8.
+the same analytic samples as the domain models, so main-text Table 3 is directly
+comparable to the domain models in SI Tables S15, S17 and S18.
 
 **Model specifications are strict.** `make_lm()` stops if a requested predictor
 is missing or constant, rather than fitting a reduced model, so an upstream join
@@ -175,6 +181,13 @@ per square kilometre.
 
 **Random seed.** All bootstrap procedures draw from `WB_SEED` in `00_config.R`,
 so the mediation confidence intervals are exactly reproducible.
+
+**Respondent locations are never published.** The survey holds approximate home
+coordinates for 381 foreign-born adults, a quarter of whom report no official
+immigration status. `06_maps_descriptives.R` writes point maps for internal
+checking only. The SI maps produced by `18_si_maps.R` show respondents as binned
+counts per census tract, with counts of one and two pooled into a single class,
+and no individual location appears in any published figure.
 
 **Spatial standard errors are computed from first principles.** `16_robustness.R`
 implements the Conley spatial HAC estimator directly — a Bartlett kernel over
@@ -190,7 +203,7 @@ R ≥ 4.2 (developed and run under 4.5.0). Package versions are pinned in
 `renv.lock`; `renv::restore()` installs them. `sessionInfo.txt` is written to the
 data folder after each full run.
 
-Analysis stage (07–14): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
+Analysis stage (07–17): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
 `broom`, `modelsummary`, `mediation`, `flextable`, `officer`. Figures use base
 graphics only, so nothing beyond a working `cairo` PNG device is needed.
 
@@ -204,7 +217,7 @@ Spatial stage (01–06) additionally: `sf`, `terra`, `tigris`, `tidycensus`,
 tidycensus::census_api_key("YOUR_KEY", install = TRUE)
 ```
 
-Restart R afterwards. Scripts 02–14 do not use the Census API, so an existing
+Restart R afterwards. Scripts 02–17 do not use the Census API, so an existing
 `respondents_with_acs.csv` lets you skip script 01.
 
 **Script 02 is the long-running step.** It extracts land cover from a 6.6 GB
