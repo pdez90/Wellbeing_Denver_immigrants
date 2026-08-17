@@ -39,7 +39,7 @@
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
 if (!exists("WB_LABELS")) source("wb_labels.R")
-wb_require(c("tidyverse", "readr", "broom", "sandwich", "lmtest", "MASS"))
+wb_require(c("tidyverse", "readr", "broom", "sandwich", "MASS"))
 
 obj <- readRDS(file.path(out_dir, "model_objects.rds"))
 if (is.null(obj$dat_derived)) stop("Re-run 08_domain_models.R: model_objects.rds is out of date.")
