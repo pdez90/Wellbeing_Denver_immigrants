@@ -74,10 +74,16 @@ Each script reads the previous script's output. Run them in order.
 | 08 | `08_domain_models.R` | Scale reliability, base and context models, five domain models, final model, VIF diagnostics | 05 output | `all_model_coefficients.csv`, `model_fit_summary.csv`, `vif_diagnostics.csv`, `zoning_joint_tests.csv`, `domain_models_*.csv/.docx/.html`, `model_objects.rds` |
 | 09 | `09_mediation.R` | Formal causal mediation | 08 output | `formal_mediation_results_domain_models.csv`, `Table8_Formal_Mediation.csv/.docx` |
 | 10 | `10_greenness_sensitivity.R` | Greenness specification sensitivity analysis | 08 output | `greenness_sensitivity.csv/.docx` |
-| 11 | `11_manuscript_tables.R` | Assembles Tables 1–10 exactly as numbered in the manuscript | 08, 09 output | `manuscript_tables/Table01–10.csv`, `Manuscript_Tables.docx` |
+| 11 | `11_manuscript_tables.R` | Assembles the ten model tables and writes the map from these numbers to the manuscript's | 08, 09 output | `manuscript_tables/Table01–10.csv`, `Manuscript_Tables.docx`, `table_numbering.csv` |
+| 12 | `12_figure_mediation_dag.R` | Figure 1, the mediation path diagram | — | `figures/Figure1_Mediation_DAG.png/.pdf` |
+| 13 | `13_descriptives_all.R` | A descriptive table and a distribution figure for every variable used in any model, plus a Word appendix | 08 output | `descriptives/Table_A*.csv`, `descriptives/figures/`, `Descriptive_Statistics_Appendix.docx` |
+| 14 | `14_figure_coefficients.R` | Figure 2, every adjusted association on one pair of axes | 08 output | `figures/Figure2_Coefficients.png/.pdf/.csv` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
+`wb_labels.R` holds the printed label for every model term, and is sourced by
+11, 13 and 14 so a variable is never called two different things in two
+different tables.
 
 ---
 
@@ -92,9 +98,26 @@ tables directly through `officer`, so no external pandoc installation is needed.
 | §3.2 Table 3, individual characteristics and neighborhood context | 08 |
 | §3.3–3.5 Tables 4–6, domain models | 08 |
 | §3.6–3.7 Tables 7–8, belonging and final models | 08 |
-| §3.8 Table 9, mediation | 09 |
+| §3.8 mediation | 09 |
 | §3.4 greenness sensitivity analysis | 10 |
-| Tables 1–10 as numbered in the manuscript | 11 |
+| all model tables, and the map to the manuscript's numbering | 11 |
+| Figure 1, the mediation diagram | 12 |
+| SI Section S2, descriptives for every variable | 13 |
+| Figure 2, the coefficient plot | 14 |
+
+**Where each table and figure ends up.** The manuscript keeps five items in the
+main text and moves the rest to the Supplementary Information:
+
+| Manuscript | Content | Script |
+|---|---|---|
+| Table 1 | Sample characteristics and outcome variables | 11 |
+| Figure 1 | Mediation model estimated for each exposure | 12 |
+| Figure 2 | All adjusted associations, both outcomes | 14 |
+| Table 2 | Final parsimonious models | 11 |
+| Table 3 | Formal causal mediation analyses | 09, 11 |
+| Tables S1–S3, S5–S7 | Full model output | 11 |
+| Table S4 | Greenness specification sensitivity | 10, 11 |
+| Tables S8–S19, Figures S1–S9 | Descriptives for every analysis variable | 13 |
 
 ---
 
@@ -155,8 +178,9 @@ R ≥ 4.2 (developed and run under 4.5.0). Package versions are pinned in
 `renv.lock`; `renv::restore()` installs them. `sessionInfo.txt` is written to the
 data folder after each full run.
 
-Analysis stage (07–10): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
-`broom`, `modelsummary`, `mediation`, `flextable`, `officer`
+Analysis stage (07–14): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
+`broom`, `modelsummary`, `mediation`, `flextable`, `officer`. Figures use base
+graphics only, so nothing beyond a working `cairo` PNG device is needed.
 
 Spatial stage (01–06) additionally: `sf`, `terra`, `tigris`, `tidycensus`,
 `foreign`, `haven`
@@ -168,7 +192,7 @@ Spatial stage (01–06) additionally: `sf`, `terra`, `tigris`, `tidycensus`,
 tidycensus::census_api_key("YOUR_KEY", install = TRUE)
 ```
 
-Restart R afterwards. Scripts 02–10 do not use the Census API, so an existing
+Restart R afterwards. Scripts 02–14 do not use the Census API, so an existing
 `respondents_with_acs.csv` lets you skip script 01.
 
 **Script 02 is the long-running step.** It extracts land cover from a 6.6 GB
