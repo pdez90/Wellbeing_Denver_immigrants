@@ -41,14 +41,14 @@ Total on-disk size is roughly 9 GB, dominated by the DRCOG land-cover raster.
 | `crash_2019.csv` | 04 | DRCOG regional crash records, 2019. A shapefile version exists at `crash_2019/drcog_crash_2019.shp`; the CSV is the one used. |
 | `short_trip_opportunity_zones/*.shp` | 05 | DRCOG short-trip opportunity zones. |
 | `htaindex2019_data_blkgrps_08.csv` | 05 | CNT Housing + Transportation Affordability Index, 2019, Colorado block groups. |
-| `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Wang et al. (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. |
+| `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Zhou & Lu (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. |
 | `diversity_CO.csv` | 05 | Residential and experienced diversity, Colorado. |
 
 ## Note on `seg_poi.csv`
 
-Replication data for Wang et al. (2025), "Varying relationships between
+Replication data for Zhou, Y., & Lu, Y. (2025). "Varying relationships between
 experienced income segregation and travel behaviour across neighbourhood social
-and urban contexts", *Nature Communications* 16:11236.
+and urban contexts." *Nature Communications*, 16, 11236.
 https://doi.org/10.1038/s41467-025-66585-z — deposited at
 https://figshare.com/projects/Travel_Behaviour_and_Income_Segregation/266242
 
