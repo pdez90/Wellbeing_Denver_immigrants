@@ -148,9 +148,12 @@ zon_path <- file.path(out_dir, "Zoning", "ALL_DenverMSA_10.3.23.shp")
 if (!file.exists(zon_path)) stop("18_si_maps.R: zoning shapefile not found at ", zon_path)
 
 zon <- sf::st_read(zon_path, quiet = TRUE)
-zcol <- grep("^gen_zone2$|gen_zone2", names(zon), value = TRUE)[1]
-if (is.na(zcol)) stop("18_si_maps.R: no gen_zone2 column in the zoning file; columns are: ",
-                      paste(names(zon), collapse = ", "))
+# The shapefile spells it GenZone2; 02_enviro_zoning_walkability_landcover.R
+# only sees gen_zone2 because janitor::clean_names() runs there and not here.
+zcol <- grep("gen[_]?zone[_]?2", names(zon), ignore.case = TRUE, value = TRUE)[1]
+if (is.na(zcol)) stop("18_si_maps.R: no generalized-zoning column in the zoning file; ",
+                      "columns are: ", paste(names(zon), collapse = ", "))
+cat("18_si_maps.R: using zoning column '", zcol, "'\n", sep = "")
 zon <- sf::st_transform(zon, CRS)
 
 # the same four categories the land-use models use
