@@ -113,46 +113,68 @@ readr::write_csv(D, file.path(fig_dir, "Figure2_Coefficients.csv"))
 # Drawing
 # -----------------------------------------------------------------------------
 
-COL_SWB <- "#B23A48"   # subjective well-being
+COL_SWB <- "#A6293B"   # subjective well-being
 COL_BEL <- "#1F4E5F"   # neighborhood belonging
+GRID    <- "#E4E4E4"
+LEADER  <- "#CFCFCF"
+RULE    <- "#555555"
 
+# A filled marker means the interval excludes zero at p < .05; an open marker
+# means it does not. The reader can then find the significant rows at a glance
+# without decoding asterisks.
 draw_panel <- function(d, title, xr) {
   groups <- unique(d$group)
   d$row <- NA_integer_
-  y <- 0; head_rows <- list()
+  y <- 0.4; head_rows <- list()
   for (g in groups) {
-    y <- y + 1; head_rows[[g]] <- y                      # blank row for the heading
+    y <- y + 1.15; head_rows[[g]] <- y                 # heading sits on its own row
     idx <- which(d$group == g)
     for (k in idx) { y <- y + 1; d$row[k] <- y }
   }
-  ymax <- y + 0.6
+  ymax <- y + 0.7
 
   graphics::plot(NA, xlim = xr, ylim = c(ymax, 0.2), axes = FALSE,
-                 xlab = "Standardized coefficient (95% CI)", ylab = "",
-                 cex.lab = 0.85)
-  graphics::abline(v = 0, col = "#999999", lwd = 1)
-  graphics::abline(h = d$row, col = "#F0F0F0", lwd = 6)   # faint banding
-  graphics::abline(v = 0, col = "#999999", lwd = 1)
-  graphics::axis(1, cex.axis = 0.8)
+                 xlab = "", ylab = "")
 
-  # Variable names and group headings live in the left margin. They are drawn
-  # with text() rather than axis(): axis() silently drops labels it thinks
-  # overlap, which on a 25-row panel quietly deletes half of them.
-  lab_x  <- xr[1] - diff(xr) * 0.03
+  ticks <- pretty(xr, n = 5)
+  ticks <- ticks[ticks >= xr[1] & ticks <= xr[2]]
+  graphics::abline(v = ticks, col = GRID, lwd = 0.8)
+  graphics::abline(v = 0, col = "#8A8A8A", lwd = 1.1)
+
+  graphics::axis(1, at = ticks, col = "#9A9A9A", col.axis = "#333333",
+                 cex.axis = 0.78, lwd = 0.9, tck = -0.012)
+  graphics::mtext("Standardized coefficient (95% CI)", side = 1, line = 2.0, cex = 0.78)
+
+  lab_x  <- xr[1] - diff(xr) * 0.035
   head_x <- graphics::grconvertX(0.004, "nfc", "user")
-  graphics::text(lab_x, d$row, d$label, adj = 1, cex = 0.72, xpd = NA)
+
+  # dotted leaders carry the eye from the label to the estimate
+  graphics::segments(lab_x + diff(xr) * 0.008, d$row, xr[1], d$row,
+                     col = LEADER, lty = 3, lwd = 0.7, xpd = NA)
+
+  graphics::text(lab_x, d$row, d$label, adj = 1, cex = 0.74, xpd = NA, col = "#1A1A1A")
   for (g in groups) {
-    graphics::text(head_x, head_rows[[g]], g, adj = 0, cex = 0.72, font = 2, xpd = NA)
+    graphics::text(head_x, head_rows[[g]], g, adj = 0, cex = 0.74, font = 2,
+                   xpd = NA, col = "#000000")
   }
-  graphics::mtext(title, side = 3, line = 0.9, adj = 0, at = graphics::grconvertX(0.01, "nfc", "user"),
-                  font = 2, cex = 0.9, xpd = NA)
+
+  graphics::mtext(title, side = 3, line = 1.25, adj = 0, font = 2, cex = 0.92,
+                  at = graphics::grconvertX(0.004, "nfc", "user"), xpd = NA)
+  graphics::segments(graphics::grconvertX(0.004, "nfc", "user"), 0.35, xr[2], 0.35,
+                     col = RULE, lwd = 0.9, xpd = NA)
 
   for (k in seq_len(nrow(d))) {
     yy <- d$row[k]
-    graphics::segments(d$swb_lo[k], yy - 0.19, d$swb_hi[k], yy - 0.19, col = COL_SWB, lwd = 1.5)
-    graphics::points(d$swb_est[k], yy - 0.19, pch = 19, col = COL_SWB, cex = 0.75)
-    graphics::segments(d$bel_lo[k], yy + 0.19, d$bel_hi[k], yy + 0.19, col = COL_BEL, lwd = 1.5)
-    graphics::points(d$bel_est[k], yy + 0.19, pch = 17, col = COL_BEL, cex = 0.75)
+    sig_s <- !is.na(d$swb_p[k]) && d$swb_p[k] < 0.05
+    sig_b <- !is.na(d$bel_p[k]) && d$bel_p[k] < 0.05
+    graphics::segments(d$swb_lo[k], yy - 0.20, d$swb_hi[k], yy - 0.20,
+                       col = COL_SWB, lwd = if (sig_s) 1.7 else 1.0)
+    graphics::points(d$swb_est[k], yy - 0.20, pch = if (sig_s) 21 else 1, cex = 0.8,
+                     col = COL_SWB, bg = COL_SWB, lwd = 1.2)
+    graphics::segments(d$bel_lo[k], yy + 0.20, d$bel_hi[k], yy + 0.20,
+                       col = COL_BEL, lwd = if (sig_b) 1.7 else 1.0)
+    graphics::points(d$bel_est[k], yy + 0.20, pch = if (sig_b) 24 else 2, cex = 0.72,
+                     col = COL_BEL, bg = COL_BEL, lwd = 1.2)
   }
 }
 
@@ -160,27 +182,38 @@ draw_figure <- function() {
   xr <- range(c(D$swb_lo, D$swb_hi, D$bel_lo, D$bel_hi), na.rm = TRUE)
   pad <- diff(xr) * 0.04; xr <- xr + c(-pad, pad)
 
-  graphics::par(family = "serif", mfrow = c(2, 1), oma = c(2.0, 0, 0, 0),
-                mar = c(3.6, 14.2, 2.8, 1.0), mgp = c(2.0, 0.6, 0))
+  # Panel heights follow the number of rows each panel holds, so the two have
+  # the same line spacing instead of one being stretched to fill its half.
+  rows_in <- function(p) {
+    d <- D[D$panel == p, ]
+    nrow(d) + length(unique(d$group)) * 1.15
+  }
+  hA <- rows_in("A"); hB <- rows_in("B")
+  graphics::layout(matrix(1:3, ncol = 1), heights = c(hA + 6, hB + 6, 2.4))
+
+  graphics::par(family = "serif", mar = c(3.4, 14.6, 3.0, 1.2), mgp = c(2.0, 0.55, 0))
   draw_panel(D[D$panel == "A", ], "A. Individual characteristics and neighborhood context", xr)
   draw_panel(D[D$panel == "B", ], "B. Built environment measures, by domain", xr)
 
-  graphics::par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+  graphics::par(mar = c(0, 0, 0, 0))
   graphics::plot.new()
-  graphics::legend("bottom", horiz = TRUE, bty = "n", cex = 0.85,
-                   legend = c("Subjective well-being", "Neighborhood belonging"),
-                   col = c(COL_SWB, COL_BEL), pch = c(19, 17), lwd = 1.5, seg.len = 1.4)
+  graphics::legend("center", horiz = TRUE, bty = "n", cex = 0.85,
+                   legend = c("Subjective well-being", "Neighborhood belonging",
+                              "filled = p < 0.05"),
+                   col = c(COL_SWB, COL_BEL, NA), pt.bg = c(COL_SWB, COL_BEL, NA),
+                   pch = c(21, 24, NA), lwd = c(1.7, 1.7, NA), seg.len = 1.4,
+                   text.col = c("#1A1A1A", "#1A1A1A", "#555555"))
 }
 
 # Portrait, two stacked panels: sized to sit in a single-column manuscript page
 # without a landscape break.
 grDevices::png(file.path(fig_dir, "Figure2_Coefficients.png"),
-               width = 7.2, height = 9.6, units = "in", res = 300,
+               width = 7.4, height = 10.2, units = "in", res = 600,
                type = "cairo", bg = "white")
 draw_figure()
 grDevices::dev.off()
 
-grDevices::pdf(file.path(fig_dir, "Figure2_Coefficients.pdf"), width = 7.2, height = 9.6)
+grDevices::pdf(file.path(fig_dir, "Figure2_Coefficients.pdf"), width = 7.4, height = 10.2)
 draw_figure()
 grDevices::dev.off()
 
