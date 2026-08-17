@@ -78,6 +78,7 @@ Each script reads the previous script's output. Run them in order.
 | 12 | `12_figure_mediation_dag.R` | Figure 1, the mediation path diagram | — | `figures/Figure1_Mediation_DAG.png/.pdf` |
 | 13 | `13_descriptives_all.R` | A descriptive table and a distribution figure for every variable used in any model, plus a Word appendix | 08 output | `descriptives/Table_A*.csv`, `descriptives/figures/`, `Descriptive_Statistics_Appendix.docx` |
 | 14 | `14_figure_coefficients.R` | Figure 2, every adjusted association on one pair of axes | 08 output | `figures/Figure2_Coefficients.png/.pdf/.csv` |
+| 15 | `15_buffer_sensitivity.R` | Refits every domain containing buffer measures at 400 m and 1,600 m, sample and all other terms held fixed | 08 output | `buffer_sensitivity.csv`, `buffer_sensitivity_wide.csv` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
@@ -104,6 +105,7 @@ different tables.
 | Figure 1, the mediation diagram | 12 |
 | SI Section S2, descriptives for every variable | 13 |
 | Figure 2, the coefficient plot | 14 |
+| §3.9 and SI Table S20, buffer radius sensitivity | 15 |
 
 **Where each table and figure ends up.** The manuscript keeps five items in the
 main text and moves the rest to the Supplementary Information:
@@ -115,9 +117,9 @@ main text and moves the rest to the Supplementary Information:
 | Figure 2 | All adjusted associations, both outcomes | 14 |
 | Table 2 | Final parsimonious models | 11 |
 | Table 3 | Formal causal mediation analyses | 09, 11 |
-| Tables S1–S3, S5–S7 | Full model output | 11 |
-| Table S4 | Greenness specification sensitivity | 10, 11 |
-| Tables S8–S19, Figures S1–S9 | Descriptives for every analysis variable | 13 |
+| SI Section S1, Tables S1–S13, Figures S1–S9 | Descriptives for every analysis variable | 11 (Table S1), 13 |
+| SI Section S2, Tables S14–S15, S17–S19 | Full model output | 11 |
+| SI Table S16 | Greenness specification sensitivity | 10, 11 |
 
 ---
 
@@ -125,8 +127,10 @@ main text and moves the rest to the Supplementary Information:
 
 **Buffers.** Measures describing features around each residence are computed in
 circular buffers of 400 m, 800 m, and 1,600 m. The 800 m buffer, roughly a
-ten-minute walk, is the primary exposure; the other two support sensitivity
-analyses. All buffer and distance computations use NAD83 / UTM zone 13N
+ten-minute walk, is the primary exposure. `15_buffer_sensitivity.R` refits every
+domain containing buffer measures at the other two radii, holding the analytic
+sample and all other model terms fixed, and checks that the 800 m column
+reproduces the domain models exactly; the result is SI Table S20. All buffer and distance computations use NAD83 / UTM zone 13N
 (EPSG:26913), in metres.
 
 **Analytic samples differ by domain.** Buffer-derived measures are available for

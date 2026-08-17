@@ -28,6 +28,9 @@ WB_LABELS <- c(
   div_total_diversity_resi_z = "Residential diversity", div_exposure_mean_z = "Experienced diversity",
   belonging_z = "Neighborhood belonging", zone_adu_yes = "ADU permitted",
   pfa_share_800_z = "Pedestrian focus area share",
-  zone_categoryRes_medhigh = "Zoning: residential medium-high",
-  zone_categoryMixedUse = "Zoning: mixed use", zone_categoryNonres = "Zoning: nonresidential"
+  # lm() names a factor contrast by pasting the level onto the variable, so
+  # these keys must match the level strings in collapse_zone() exactly.
+  `zone_categoryResidential, medium-high density` = "Zoning: residential, medium-high density",
+  `zone_categoryMixed use` = "Zoning: mixed use",
+  `zone_categoryNonresidential` = "Zoning: nonresidential"
 )

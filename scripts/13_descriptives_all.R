@@ -84,8 +84,8 @@ VARS <- rbind(
   V("ind_imm_other",    "DACA, student/work visa, refugee, asylee", "0/1", "Individual characteristics", "binary"),
 
   # ---- neighborhood socioeconomic context ----------------------------------
-  V("pop_density",            "Population density",     "persons/km2",       "Neighborhood socioeconomic context"),
-  V("housing_density",        "Housing density",        "housing units/km2", "Neighborhood socioeconomic context"),
+  V("pop_density",            "Population density",     "persons/km\u00b2",       "Neighborhood socioeconomic context"),
+  V("housing_density",        "Housing density",        "housing units/km\u00b2", "Neighborhood socioeconomic context"),
   V("dist_downtown_km",       "Distance to downtown Denver", "km",           "Neighborhood socioeconomic context"),
   V("pct_poverty",            "Population below poverty",    "%",            "Neighborhood socioeconomic context"),
   V("pct_non_native",         "Foreign-born population",     "%",            "Neighborhood socioeconomic context"),
@@ -98,9 +98,9 @@ VARS <- rbind(
 
   # ---- transportation and accessibility -------------------------------------
   V("hudjob_jobs_idx",             "HUD Jobs Proximity Index",    "index, 0-100", "Transportation and accessibility"),
-  V("sidewalk_density_800",        "Sidewalk density, 800 m",     "m/km2",        "Transportation and accessibility"),
-  V("bike_facility_density_800",   "Bicycle facility density, 800 m", "m/km2",    "Transportation and accessibility"),
-  V("active_corridor_density_800", "Active corridor density, 800 m",  "m/km2",    "Transportation and accessibility"),
+  V("sidewalk_density_800",        "Sidewalk density, 800 m",     "m/km\u00b2",        "Transportation and accessibility"),
+  V("bike_facility_density_800",   "Bicycle facility density, 800 m", "m/km\u00b2",    "Transportation and accessibility"),
+  V("active_corridor_density_800", "Active corridor density, 800 m",  "m/km\u00b2",    "Transportation and accessibility"),
   V("ht_t_ami",                    "Transportation cost at area median income", "% of income", "Transportation and accessibility"),
 
   # ---- greenness and parks --------------------------------------------------
@@ -112,9 +112,9 @@ VARS <- rbind(
   V("lc_800m_impervious_surfaces", "Impervious surface land cover, 800 m", "share of buffer", "Greenness and parks"),
 
   # ---- safety and social environment ----------------------------------------
-  V("crash_density_800",        "Crash density, 800 m",            "crashes/km2",     "Safety and social environment"),
-  V("ped_crash_density_800",    "Pedestrian crash density, 800 m", "crashes/km2",     "Safety and social environment"),
-  V("bike_crash_density_800",   "Bicycle crash density, 800 m",    "crashes/km2",     "Safety and social environment"),
+  V("crash_density_800",        "Crash density, 800 m",            "crashes/km\u00b2",     "Safety and social environment"),
+  V("ped_crash_density_800",    "Pedestrian crash density, 800 m", "crashes/km\u00b2",     "Safety and social environment"),
+  V("bike_crash_density_800",   "Bicycle crash density, 800 m",    "crashes/km\u00b2",     "Safety and social environment"),
   V("short_trip_zone_share_800","Short-trip opportunity zone share, 800 m", "share of buffer", "Safety and social environment"),
   V("div_total_diversity_resi", "Residential diversity",           "index, 0-1",      "Safety and social environment"),
   V("div_exposure_mean",        "Experienced diversity",           "index, 0-1",      "Safety and social environment"),
@@ -242,7 +242,7 @@ readr::write_csv(coverage, file.path(out_desc, "Variable_coverage.csv"))
 # 3. Figures -- one per variable, plus one panel per group
 # -----------------------------------------------------------------------------
 
-draw_one <- function(v, cex_axis = 0.8, main_cex = 0.95) {
+draw_one <- function(v, cex_axis = 0.9, main_cex = 1.0) {
   x <- dat[[v$name]]
   if (v$type == "continuous") {
     x <- suppressWarnings(as.numeric(x)); x <- x[!is.na(x)]
@@ -251,12 +251,16 @@ draw_one <- function(v, cex_axis = 0.8, main_cex = 0.95) {
     h  <- graphics::hist(x, breaks = br, plot = FALSE)
     graphics::plot(h, col = "#D9E2EC", border = "#5B7185", freq = TRUE,
                    main = "", xlab = v$unit, ylab = "Respondents",
-                   cex.axis = cex_axis, cex.lab = 0.8)
+                   cex.axis = cex_axis, cex.lab = cex_axis * 1.02)
     graphics::abline(v = mean(x),           col = "#B23A48", lwd = 2)
     graphics::abline(v = stats::median(x),  col = "#1F4E5F", lwd = 2, lty = 2)
     graphics::rug(x, col = "#7A7A7A", lwd = 0.4)
     graphics::title(main = v$label, cex.main = main_cex, font.main = 1)
-    graphics::legend("topright", bty = "n", cex = 0.62,
+    # put the legend over the emptier half of the plot
+    side <- if (sum(h$counts[seq_len(ceiling(length(h$counts) / 2))]) >
+                sum(h$counts[-seq_len(ceiling(length(h$counts) / 2))]))
+              "topright" else "topleft"
+    graphics::legend(side, bty = "n", cex = cex_axis * 0.82,
                      legend = c(sprintf("mean %s", fmt(mean(x))),
                                 sprintf("median %s", fmt(stats::median(x))),
                                 sprintf("n = %d", length(x))),
@@ -273,9 +277,10 @@ draw_one <- function(v, cex_axis = 0.8, main_cex = 0.95) {
     lab <- ifelse(nchar(lab) > 18, paste0(substr(lab, 1, 16), "..."), lab)
     bp <- graphics::barplot(as.numeric(tab), names.arg = lab, col = "#D9E2EC",
                             border = "#5B7185", ylab = "Respondents", las = 1,
-                            cex.names = 0.65, cex.axis = cex_axis, cex.lab = 0.8,
-                            ylim = c(0, max(tab) * 1.18))
-    graphics::text(bp, as.numeric(tab), pos = 3, cex = 0.65,
+                            cex.names = cex_axis * 0.9, cex.axis = cex_axis,
+                            cex.lab = cex_axis * 1.02,
+                            ylim = c(0, max(tab) * 1.20))
+    graphics::text(bp, as.numeric(tab), pos = 3, cex = cex_axis * 0.85,
                    labels = sprintf("%d (%s%%)", as.integer(tab),
                                     fmt(100 * as.numeric(tab) / sum(tab))))
     graphics::title(main = v$label, cex.main = main_cex, font.main = 1)
@@ -286,7 +291,7 @@ draw_one <- function(v, cex_axis = 0.8, main_cex = 0.95) {
 for (i in seq_len(nrow(VARS))) {
   v <- VARS[i, ]
   grDevices::png(file.path(out_fig, sprintf("%s.png", v$name)),
-                 width = 5.2, height = 4.0, units = "in", res = 200,
+                 width = 5.2, height = 4.0, units = "in", res = 400,
                  type = "cairo", bg = "white")
   graphics::par(mar = c(4.2, 4.2, 2.6, 1.0), family = "serif")
   draw_one(v)
@@ -299,17 +304,23 @@ panel_dims  <- list()
 for (g in GROUPS) {
   rows <- VARS[VARS$group == g, ]
   n    <- nrow(rows)
-  ncol <- if (n <= 2) n else if (n <= 6) 3 else 4
+  # At most three columns. A four-column panel has to be shrunk to about half
+  # size to fit the page, which is what made the axis text unreadable; three
+  # columns of 2.5 in sit on the page at close to their drawn size.
+  ncol  <- if (n <= 2) n else 3
   nrow_ <- ceiling(n / ncol)
+  w_in  <- 2.5 * ncol
+  h_in  <- 2.25 * nrow_
   f <- file.path(out_fig, sprintf("Panel_%s.png", safe(g)))
-  grDevices::png(f, width = 3.4 * ncol, height = 2.9 * nrow_, units = "in",
-                 res = 200, type = "cairo", bg = "white")
-  graphics::par(mfrow = c(nrow_, ncol), mar = c(4.0, 4.0, 2.4, 0.8), family = "serif")
-  for (i in seq_len(n)) draw_one(rows[i, ], cex_axis = 0.75, main_cex = 0.9)
+  grDevices::png(f, width = w_in, height = h_in, units = "in",
+                 res = 400, type = "cairo", bg = "white")
+  graphics::par(mfrow = c(nrow_, ncol), mar = c(3.9, 3.9, 2.5, 0.9),
+                mgp = c(2.3, 0.6, 0), family = "serif")
+  for (i in seq_len(n)) draw_one(rows[i, ], cex_axis = 0.9, main_cex = 1.0)
   grDevices::dev.off()
   panel_files <- c(panel_files, f)
   names(panel_files)[length(panel_files)] <- g
-  panel_dims[[g]] <- c(w = 3.4 * ncol, h = 2.9 * nrow_)
+  panel_dims[[g]] <- c(w = w_in, h = h_in)
 }
 
 # -----------------------------------------------------------------------------

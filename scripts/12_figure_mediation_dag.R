@@ -128,7 +128,7 @@ draw_figure <- function() {
 }
 
 png(file.path(fig_dir, "Figure1_Mediation_DAG.png"),
-    width = 9.4, height = 4.4, units = "in", res = 300, type = "cairo",
+    width = 9.4, height = 4.4, units = "in", res = 600, type = "cairo",
     bg = "white")
 draw_figure()
 dev.off()

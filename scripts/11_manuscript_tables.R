@@ -16,15 +16,17 @@
 # submitted manuscript keeps five items in the main text and moves the rest to
 # the Supplementary Information, so the mapping is:
 #
-#   Table 1  -> main text Table 1        Table 6  -> SI Table S6
-#   Table 2  -> SI Table S1              Table 7  -> SI Table S7
-#   Table 3  -> SI Table S2              Table 8  -> main text Table 2
-#   Table 4  -> SI Table S3              Table 9  -> main text Table 3
-#   Table 5  -> SI Table S5              Table 10 -> SI Table S4
+#   Table 1  -> main text Table 1        Table 6  -> SI Table S18
+#   Table 2  -> SI Table S1              Table 7  -> SI Table S19
+#   Table 3  -> SI Table S14             Table 8  -> main text Table 2
+#   Table 4  -> SI Table S15             Table 9  -> main text Table 3
+#   Table 5  -> SI Table S17             Table 10 -> SI Table S16
 #
-# Main text also carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
-# (14_figure_coefficients.R); the SI carries Figures S1-S9 and the descriptive
-# tables from 13_descriptives_all.R. This mapping is written to
+# The SI has two sections: Section S1 is descriptive statistics for every
+# analysis variable (Tables S1-S13, Figures S1-S9, from 13_descriptives_all.R)
+# and Section S2 is the full model output (Tables S14-S19). Main text also
+# carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
+# (14_figure_coefficients.R). This mapping is written to
 # manuscript_tables/table_numbering.csv as well, so it is machine-readable.
 #
 # Table numbering:
@@ -112,19 +114,27 @@ cont <- c(swb = "Subjective well-being index", bel = "Neighborhood belonging ind
           engl_speak = "English-speaking proficiency (1-5)",
           time_live_denver = "Years in Denver metro (ordinal)",
           time_live_hood = "Years in current neighborhood (ordinal)")
+# Table 1 is split into two panels. A standard deviation, minimum and maximum
+# are not defined for a categorical measure, so those cells carry an em dash
+# rather than being left empty -- an empty cell reads as a missing number.
+NA_CELL <- "\u2014"
+
 rows1 <- list()
+rows1[[1]] <- c("Panel A. Continuous and ordinal measures", "", "", "", "", "")
 for (v in names(cont)) {
   x <- to_num(raw[[v]])
   rows1[[length(rows1) + 1]] <- c(cont[[v]], sum(!is.na(x)), sprintf("%.2f", mean(x, na.rm = TRUE)),
                                   sprintf("%.2f", sd(x, na.rm = TRUE)), sprintf("%.2f", min(x, na.rm = TRUE)),
                                   sprintf("%.2f", max(x, na.rm = TRUE)))
 }
+rows1[[length(rows1) + 1]] <- c("Panel B. Categorical measures", "", "", "", "", "")
 add_cat <- function(v, labs, heading) {
   x <- to_num(raw[[v]]); tt <- table(x)
   rows1[[length(rows1) + 1]] <<- c(heading, "", "", "", "", "")
   for (k in names(tt))
     rows1[[length(rows1) + 1]] <<- c(paste0("   ", labs[[k]]), sum(!is.na(x)),
-                                     sprintf("%.1f%%", 100 * tt[[k]] / sum(tt)), "", "", "")
+                                     sprintf("%.1f%%", 100 * tt[[k]] / sum(tt)),
+                                     NA_CELL, NA_CELL, NA_CELL)
 }
 add_cat("gender", list("0"="Male","1"="Female"), "Gender")
 add_cat("marital", list("0"="Single, never married","1"="Married","2"="Separated","3"="Divorced","4"="Widowed"), "Marital status")
@@ -135,7 +145,7 @@ add_cat("imm_status", list("0"="Naturalized U.S. citizen","1"="Lawful permanent 
                            "2"="No official status (undocumented)","3"="DACA recipient","4"="Student visa",
                            "5"="Refugee status","6"="Asylee status","7"="Work visa"), "Immigration status")
 T1 <- as.data.frame(do.call(rbind, rows1), stringsAsFactors = FALSE)
-names(T1) <- c("Variable", "N", "Mean or %", "SD", "Min", "Max")
+names(T1) <- c("Variable", "N", "Mean or %", "SD", "Minimum", "Maximum")
 
 be_vars <- c(pop_density="Population density", housing_density="Housing density",
   dist_downtown_km="Distance to downtown Denver, km", pct_poverty="Percent below poverty",
@@ -230,7 +240,11 @@ specs <- list(
 max_green_vif <- function(m, gv) {
   v <- try(car::vif(m), silent = TRUE); if (inherits(v, "try-error")) return(NA_real_)
   vv <- if (is.matrix(v)) stats::setNames(v[, "GVIF"]^(1 / v[, "Df"]), rownames(v)) else stats::setNames(as.numeric(v), names(v))
-  hit <- vv[names(vv) %in% gv]; if (!length(hit)) NA_real_ else max(hit)^2
+  # car::vif() already returns the variance inflation factor for single-df
+  # terms, and the matrix branch above has converted GVIF to the comparable
+  # scale. Squaring it here was a bug: it reported 179.3 where 08_domain_models.R
+  # reports 13.4 for the same model.
+  hit <- vv[names(vv) %in% gv]; if (!length(hit)) NA_real_ else max(hit)
 }
 rows10 <- list()
 for (oc in c("belonging_z", "swb_z")) for (nm in names(specs)) {
@@ -265,7 +279,7 @@ NOTE_STARS <- paste("Standardized coefficients with standard errors in parenthes
   "+ p < 0.10, * p < 0.05, ** p < 0.01, *** p < 0.001.",
   "Reference categories: never married, naturalized U.S. citizen.")
 NOTES <- c(
-  "Continuous variables report mean, SD, minimum and maximum. Categorical variables report the percentage of respondents in each category.",
+  "Panel A reports the mean, standard deviation, minimum and maximum of each continuous or ordinal measure. Panel B reports the percentage of respondents in each category; a standard deviation, minimum and maximum are not defined for a categorical measure, and an em dash marks those cells. N is the number of respondents with a valid response to that item.",
   "Respondent-level exposures derived from geocoded residential locations. Buffer measures use the 800 m radius unless noted. Street intersection density is per square mile (ICPSR 38580).",
   NOTE_STARS, paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood socioeconomic context."),
   paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood socioeconomic context."),
@@ -300,9 +314,9 @@ print(doc, target = file.path(out_tab, "Manuscript_Tables.docx"))
 readr::write_csv(
   data.frame(
     table_here = 1:10,
-    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S2", "SI Table S3",
-                   "SI Table S5", "SI Table S6", "SI Table S7", "Main text Table 2",
-                   "Main text Table 3", "SI Table S4"),
+    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S14", "SI Table S15",
+                   "SI Table S17", "SI Table S18", "SI Table S19", "Main text Table 2",
+                   "Main text Table 3", "SI Table S16"),
     title = TITLES
   ),
   file.path(out_tab, "table_numbering.csv")
