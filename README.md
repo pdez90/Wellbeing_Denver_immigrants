@@ -118,11 +118,14 @@ main text and moves the rest to the Supplementary Information:
 | Table 1 | Sample characteristics and outcome variables | 11 |
 | Figure 1 | Mediation model estimated for each exposure | 12 |
 | Figure 2 | All adjusted associations, both outcomes | 14 |
-| Table 2 | Final parsimonious models | 11 |
-| Table 3 | Formal causal mediation analyses | 09, 11 |
+| Table 2 | Integrated models | 11 |
+| Table 3 | Mediation analyses | 09, 11 |
 | SI Section S1, Tables S1–S13, Figures S1–S9 | Descriptives for every analysis variable | 11 (Table S1), 13 |
 | SI Section S2, Tables S14–S15, S17–S19 | Full model output | 11 |
 | SI Table S16 | Greenness specification sensitivity | 10, 11 |
+| SI Table S20 | Buffer radius sensitivity | 15 |
+| SI Section S3, Tables S21–S24 | Robustness checks | 16 |
+| Graphical abstract | One-page summary of every model | 17 |
 
 ---
 
@@ -161,8 +164,8 @@ Reference categories are never married and naturalized U.S. citizen. See
 `demographic_labels` in `08_domain_models.R`.
 
 **Mediation covariate set.** The mediation models use the same covariate set and
-the same analytic samples as the domain models, so Table 9 is directly
-comparable to Tables 4–8.
+the same analytic samples as the domain models, so main-text Table 3 is directly
+comparable to the domain models in SI Tables S15, S17 and S18.
 
 **Model specifications are strict.** `make_lm()` stops if a requested predictor
 is missing or constant, rather than fitting a reduced model, so an upstream join
@@ -191,7 +194,7 @@ R ≥ 4.2 (developed and run under 4.5.0). Package versions are pinned in
 `renv.lock`; `renv::restore()` installs them. `sessionInfo.txt` is written to the
 data folder after each full run.
 
-Analysis stage (07–14): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
+Analysis stage (07–17): `tidyverse`, `janitor`, `readr`, `psych`, `car`,
 `broom`, `modelsummary`, `mediation`, `flextable`, `officer`. Figures use base
 graphics only, so nothing beyond a working `cairo` PNG device is needed.
 
@@ -205,7 +208,7 @@ Spatial stage (01–06) additionally: `sf`, `terra`, `tigris`, `tidycensus`,
 tidycensus::census_api_key("YOUR_KEY", install = TRUE)
 ```
 
-Restart R afterwards. Scripts 02–14 do not use the Census API, so an existing
+Restart R afterwards. Scripts 02–17 do not use the Census API, so an existing
 `respondents_with_acs.csv` lets you skip script 01.
 
 **Script 02 is the long-running step.** It extracts land cover from a 6.6 GB
