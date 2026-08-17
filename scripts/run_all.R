@@ -38,7 +38,8 @@ analysis_scripts <- c(
   "11_manuscript_tables.R",
   "12_figure_mediation_dag.R",
   "13_descriptives_all.R",
-  "14_figure_coefficients.R"
+  "14_figure_coefficients.R",
+  "15_buffer_sensitivity.R"
 )
 
 scripts <- if (analysis_only) analysis_scripts else c(spatial_scripts, analysis_scripts)
