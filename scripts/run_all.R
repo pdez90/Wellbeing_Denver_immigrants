@@ -41,7 +41,8 @@ analysis_scripts <- c(
   "14_figure_coefficients.R",
   "15_buffer_sensitivity.R",
   "16_robustness.R",
-  "17_graphical_abstract.R"
+  "17_graphical_abstract.R",
+  "18_si_maps.R"
 )
 
 scripts <- if (analysis_only) analysis_scripts else c(spatial_scripts, analysis_scripts)

@@ -81,6 +81,7 @@ Each script reads the previous script's output. Run them in order.
 | 15 | `15_buffer_sensitivity.R` | Refits every domain containing buffer measures at 400 m and 1,600 m, sample and all other terms held fixed | 08 output | `buffer_sensitivity.csv`, `buffer_sensitivity_wide.csv` |
 | 16 | `16_robustness.R` | Common-sample refit, cluster-robust and Conley spatial standard errors, robust MM-estimator, and the well-being scale without the overlapping item | 08 output | `robustness_common_sample.csv`, `robustness_standard_errors.csv`, `robustness_robust_regression.csv`, `robustness_swb_leave_one_out.csv` |
 | 17 | `17_graphical_abstract.R` | One-page visual summary of every model, its headline estimates and the robustness checks | 08, 09, 15, 16 output | `figures/Graphical_Abstract.png/.pdf` |
+| 18 | `18_si_maps.R` | SI maps: respondent counts by tract, generalized zoning, and the area-level model measures | 05 output, zoning shapefile, tigris | `figures/Figure_S10–S12.png/.pdf` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
@@ -126,6 +127,7 @@ main text and moves the rest to the Supplementary Information:
 | SI Table S20 | Buffer radius sensitivity | 15 |
 | SI Section S3, Tables S21–S24 | Robustness checks | 16 |
 | Graphical abstract | One-page summary of every model | 17 |
+| SI Figures S10–S12 | Study area and respondents, zoning, area-level measures | 18 |
 
 ---
 
@@ -179,6 +181,13 @@ per square kilometre.
 
 **Random seed.** All bootstrap procedures draw from `WB_SEED` in `00_config.R`,
 so the mediation confidence intervals are exactly reproducible.
+
+**Respondent locations are never published.** The survey holds approximate home
+coordinates for 381 foreign-born adults, a quarter of whom report no official
+immigration status. `06_maps_descriptives.R` writes point maps for internal
+checking only. The SI maps produced by `18_si_maps.R` show respondents as binned
+counts per census tract, with counts of one and two pooled into a single class,
+and no individual location appears in any published figure.
 
 **Spatial standard errors are computed from first principles.** `16_robustness.R`
 implements the Conley spatial HAC estimator directly — a Bartlett kernel over
