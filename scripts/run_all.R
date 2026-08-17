@@ -34,7 +34,8 @@ analysis_scripts <- c(
   "07_tables_descriptive.R",
   "08_domain_models.R",
   "09_mediation.R",
-  "10_greenness_sensitivity.R"
+  "10_greenness_sensitivity.R",
+  "11_manuscript_tables.R"
 )
 
 scripts <- if (analysis_only) analysis_scripts else c(spatial_scripts, analysis_scripts)

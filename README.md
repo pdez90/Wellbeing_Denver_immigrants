@@ -74,6 +74,7 @@ Each script reads the previous script's output. Run them in order.
 | 08 | `08_domain_models.R` | Scale reliability, base and context models, five domain models, final model, VIF diagnostics | 05 output | `all_model_coefficients.csv`, `model_fit_summary.csv`, `vif_diagnostics.csv`, `zoning_joint_tests.csv`, `domain_models_*.csv/.docx/.html`, `model_objects.rds` |
 | 09 | `09_mediation.R` | Formal causal mediation | 08 output | `formal_mediation_results_domain_models.csv`, `Table8_Formal_Mediation.csv/.docx` |
 | 10 | `10_greenness_sensitivity.R` | Greenness specification sensitivity analysis | 08 output | `greenness_sensitivity.csv/.docx` |
+| 11 | `11_manuscript_tables.R` | Assembles Tables 1–10 exactly as numbered in the manuscript | 08, 09 output | `manuscript_tables/Table01–10.csv`, `Manuscript_Tables.docx` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
@@ -93,6 +94,7 @@ tables directly through `officer`, so no external pandoc installation is needed.
 | §3.6–3.7 Tables 7–8, belonging and final models | 08 |
 | §3.8 Table 9, mediation | 09 |
 | §3.4 greenness sensitivity analysis | 10 |
+| Tables 1–10 as numbered in the manuscript | 11 |
 
 ---
 
@@ -122,7 +124,10 @@ into binary indicators computed once on the full sample rather than entered as
 factors. Several response categories are very sparse (race includes cells of 2,
 4, and 5; immigration status includes cells of 5 and 10), which both consumes
 degrees of freedom on analytic samples of 238–320 and makes bootstrap resampling
-unstable. Indicator names follow the raw survey response codes; see
+unstable. Codes come from the survey codebook: Hispanic is coded Yes = 0,
+marital status is single = 0 / married = 1 / separated, divorced, widowed = 2–4,
+and immigration status runs naturalized citizen = 0 through work visa = 7.
+Reference categories are never married and naturalized U.S. citizen. See
 `demographic_labels` in `08_domain_models.R`.
 
 **Mediation covariate set.** The mediation models use the same covariate set and

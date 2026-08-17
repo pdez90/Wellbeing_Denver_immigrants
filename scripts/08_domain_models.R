@@ -116,6 +116,9 @@ cat(sprintf(
 #     White. (Many respondents coded White also left text in the "other,
 #     specify" box naming a national origin -- orphaned Qualtrics text from an
 #     earlier selection. It does not change the coding.)
+#   Q3.3 Marital status: single/never married = 0, married = 1, separated = 2,
+#     divorced = 3, widowed = 4. Entered as two indicators -- married, and
+#     previously married (2-4 combined) -- against a never-married reference.
 #   Q3.7 Immigration status: Naturalized citizen = 0, green card / lawful
 #     permanent resident = 1, no official status (undocumented) = 2, DACA = 3,
 #     student visa = 4, refugee = 5, asylee = 6, work visa = 7.
@@ -127,6 +130,7 @@ cat(sprintf(
 demographic_labels <- c(
   ind_female        = "Female",
   ind_married       = "Married",
+  ind_prev_married  = "Previously married (separated, divorced, or widowed)",
   ind_hispanic      = "Hispanic",
   ind_race_white    = "Race: White",
   ind_lpr           = "Lawful permanent resident",
@@ -138,6 +142,7 @@ dat <- dat %>%
   dplyr::mutate(
     ind_female       = as.numeric(to_num(gender)     == 1),
     ind_married      = as.numeric(to_num(marital)    == 1),
+    ind_prev_married = as.numeric(to_num(marital) %in% c(2, 3, 4)),
     ind_hispanic     = as.numeric(to_num(hispanic)   == 0),   # Yes = 0
     ind_race_white   = as.numeric(to_num(race)       == 4),
     ind_lpr          = as.numeric(to_num(imm_status) == 1),
