@@ -16,15 +16,17 @@
 # submitted manuscript keeps five items in the main text and moves the rest to
 # the Supplementary Information, so the mapping is:
 #
-#   Table 1  -> main text Table 1        Table 6  -> SI Table S6
-#   Table 2  -> SI Table S1              Table 7  -> SI Table S7
-#   Table 3  -> SI Table S2              Table 8  -> main text Table 2
-#   Table 4  -> SI Table S3              Table 9  -> main text Table 3
-#   Table 5  -> SI Table S5              Table 10 -> SI Table S4
+#   Table 1  -> main text Table 1        Table 6  -> SI Table S18
+#   Table 2  -> SI Table S1              Table 7  -> SI Table S19
+#   Table 3  -> SI Table S14             Table 8  -> main text Table 2
+#   Table 4  -> SI Table S15             Table 9  -> main text Table 3
+#   Table 5  -> SI Table S17             Table 10 -> SI Table S16
 #
-# Main text also carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
-# (14_figure_coefficients.R); the SI carries Figures S1-S9 and the descriptive
-# tables from 13_descriptives_all.R. This mapping is written to
+# The SI has two sections: Section S1 is descriptive statistics for every
+# analysis variable (Tables S1-S13, Figures S1-S9, from 13_descriptives_all.R)
+# and Section S2 is the full model output (Tables S14-S19). Main text also
+# carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
+# (14_figure_coefficients.R). This mapping is written to
 # manuscript_tables/table_numbering.csv as well, so it is machine-readable.
 #
 # Table numbering:
@@ -300,9 +302,9 @@ print(doc, target = file.path(out_tab, "Manuscript_Tables.docx"))
 readr::write_csv(
   data.frame(
     table_here = 1:10,
-    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S2", "SI Table S3",
-                   "SI Table S5", "SI Table S6", "SI Table S7", "Main text Table 2",
-                   "Main text Table 3", "SI Table S4"),
+    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S14", "SI Table S15",
+                   "SI Table S17", "SI Table S18", "SI Table S19", "Main text Table 2",
+                   "Main text Table 3", "SI Table S16"),
     title = TITLES
   ),
   file.path(out_tab, "table_numbering.csv")

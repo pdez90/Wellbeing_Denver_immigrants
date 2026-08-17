@@ -115,9 +115,9 @@ main text and moves the rest to the Supplementary Information:
 | Figure 2 | All adjusted associations, both outcomes | 14 |
 | Table 2 | Final parsimonious models | 11 |
 | Table 3 | Formal causal mediation analyses | 09, 11 |
-| Tables S1–S3, S5–S7 | Full model output | 11 |
-| Table S4 | Greenness specification sensitivity | 10, 11 |
-| Tables S8–S19, Figures S1–S9 | Descriptives for every analysis variable | 13 |
+| SI Section S1, Tables S1–S13, Figures S1–S9 | Descriptives for every analysis variable | 11 (Table S1), 13 |
+| SI Section S2, Tables S14–S15, S17–S19 | Full model output | 11 |
+| SI Table S16 | Greenness specification sensitivity | 10, 11 |
 
 ---
 
