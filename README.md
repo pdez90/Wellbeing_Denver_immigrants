@@ -79,6 +79,7 @@ Each script reads the previous script's output. Run them in order.
 | 13 | `13_descriptives_all.R` | A descriptive table and a distribution figure for every variable used in any model, plus a Word appendix | 08 output | `descriptives/Table_A*.csv`, `descriptives/figures/`, `Descriptive_Statistics_Appendix.docx` |
 | 14 | `14_figure_coefficients.R` | Figure 2, every adjusted association on one pair of axes | 08 output | `figures/Figure2_Coefficients.png/.pdf/.csv` |
 | 15 | `15_buffer_sensitivity.R` | Refits every domain containing buffer measures at 400 m and 1,600 m, sample and all other terms held fixed | 08 output | `buffer_sensitivity.csv`, `buffer_sensitivity_wide.csv` |
+| 16 | `16_robustness.R` | Common-sample refit, cluster-robust and Conley spatial standard errors, robust MM-estimator, and the well-being scale without the overlapping item | 08 output | `robustness_common_sample.csv`, `robustness_standard_errors.csv`, `robustness_robust_regression.csv`, `robustness_swb_leave_one_out.csv` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
@@ -106,6 +107,7 @@ different tables.
 | SI Section S2, descriptives for every variable | 13 |
 | Figure 2, the coefficient plot | 14 |
 | §3.9 and SI Table S20, buffer radius sensitivity | 15 |
+| §3.10 and SI Tables S21–S24, robustness | 16 |
 
 **Where each table and figure ends up.** The manuscript keeps five items in the
 main text and moves the rest to the Supplementary Information:
@@ -173,6 +175,12 @@ per square kilometre.
 
 **Random seed.** All bootstrap procedures draw from `WB_SEED` in `00_config.R`,
 so the mediation confidence intervals are exactly reproducible.
+
+**Spatial standard errors are computed from first principles.** `16_robustness.R`
+implements the Conley spatial HAC estimator directly — a Bartlett kernel over
+great-circle distances between respondents' homes — rather than depending on a
+package, so it runs on a clean R installation with nothing beyond `sandwich` and
+`MASS`. Cluster-robust standard errors use `sandwich::vcovCL`.
 
 ---
 
