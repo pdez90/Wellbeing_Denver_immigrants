@@ -80,6 +80,7 @@ Each script reads the previous script's output. Run them in order.
 | 14 | `14_figure_coefficients.R` | Figure 2, every adjusted association on one pair of axes | 08 output | `figures/Figure2_Coefficients.png/.pdf/.csv` |
 | 15 | `15_buffer_sensitivity.R` | Refits every domain containing buffer measures at 400 m and 1,600 m, sample and all other terms held fixed | 08 output | `buffer_sensitivity.csv`, `buffer_sensitivity_wide.csv` |
 | 16 | `16_robustness.R` | Common-sample refit, cluster-robust and Conley spatial standard errors, robust MM-estimator, and the well-being scale without the overlapping item | 08 output | `robustness_common_sample.csv`, `robustness_standard_errors.csv`, `robustness_robust_regression.csv`, `robustness_swb_leave_one_out.csv` |
+| 17 | `17_graphical_abstract.R` | One-page visual summary of every model, its headline estimates and the robustness checks | 08, 09, 15, 16 output | `figures/Graphical_Abstract.png/.pdf` |
 
 `wb_model_tables.R` is a helper sourced by 08; it builds the Word regression
 tables directly through `officer`, so no external pandoc installation is needed.
