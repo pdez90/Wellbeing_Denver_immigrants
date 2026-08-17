@@ -142,12 +142,17 @@ dat <- dat %>%
   dplyr::mutate(
     ind_female       = as.numeric(to_num(gender)     == 1),
     ind_married      = as.numeric(to_num(marital)    == 1),
-    ind_prev_married = as.numeric(to_num(marital) %in% c(2, 3, 4)),
+    # %in% returns FALSE for NA, which would silently recode a missing answer
+    # as "not previously married". NA is propagated explicitly instead, so the
+    # indicator is missing for exactly the respondents its parent item is.
+    ind_prev_married = ifelse(is.na(to_num(marital)), NA_real_,
+                              as.numeric(to_num(marital) %in% c(2, 3, 4))),
     ind_hispanic     = as.numeric(to_num(hispanic)   == 0),   # Yes = 0
     ind_race_white   = as.numeric(to_num(race)       == 4),
     ind_lpr          = as.numeric(to_num(imm_status) == 1),
     ind_undocumented = as.numeric(to_num(imm_status) == 2),
-    ind_imm_other    = as.numeric(to_num(imm_status) %in% c(3, 4, 5, 6, 7))
+    ind_imm_other    = ifelse(is.na(to_num(imm_status)), NA_real_,
+                              as.numeric(to_num(imm_status) %in% c(3, 4, 5, 6, 7)))
   )
 
 cat("\nDemographic indicator coverage:\n")
@@ -311,9 +316,16 @@ final_models <- list(
 all_models <- c(base_context_models, domain_models_swb, domain_models_belonging,
                 domain_models_swb_with_belonging, final_models)
 
+# `dat_derived` is the full derived respondent frame -- raw scales, recoded
+# indicators and z-scores together. 13_descriptives_all.R reads it so the
+# descriptive statistics describe exactly the variables the models use, with
+# no second copy of the recoding logic to drift out of step.
 saveRDS(
   list(model_dat = model_dat, individual_controls = individual_controls,
-       context_z = context_z, domain_z = domain_z, final_be = final_be),
+       context_z = context_z, domain_z = domain_z, final_be = final_be,
+       dat_derived = dat, context_vars = context_vars, domain_vars = domain_vars,
+       demographic_labels = demographic_labels, raw_categoricals = raw_categoricals,
+       swb_items = swb_items, belonging_items = belonging_items),
   file.path(out_dir, "model_objects.rds")
 )
 cat("Wrote model_objects.rds\n")

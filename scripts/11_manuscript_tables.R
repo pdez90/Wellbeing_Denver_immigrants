@@ -12,6 +12,21 @@
 # publication-ordered tables the manuscript refers to, with readable variable
 # labels and the goodness-of-fit rows journals expect.
 #
+# Table numbering below is the numbering of the model tables as a set. The
+# submitted manuscript keeps five items in the main text and moves the rest to
+# the Supplementary Information, so the mapping is:
+#
+#   Table 1  -> main text Table 1        Table 6  -> SI Table S6
+#   Table 2  -> SI Table S1              Table 7  -> SI Table S7
+#   Table 3  -> SI Table S2              Table 8  -> main text Table 2
+#   Table 4  -> SI Table S3              Table 9  -> main text Table 3
+#   Table 5  -> SI Table S5              Table 10 -> SI Table S4
+#
+# Main text also carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
+# (14_figure_coefficients.R); the SI carries Figures S1-S9 and the descriptive
+# tables from 13_descriptives_all.R. This mapping is written to
+# manuscript_tables/table_numbering.csv as well, so it is machine-readable.
+#
 # Table numbering:
 #   1  Sample characteristics and outcome variables
 #   2  Neighborhood and built environment characteristics
@@ -43,32 +58,8 @@ set.seed(WB_SEED)
 # -----------------------------------------------------------------------------
 # Readable labels
 # -----------------------------------------------------------------------------
-LBL <- c(
-  age = "Age", children = "Number of children", income_hh = "Household income",
-  edu_level = "Education", engl_speak = "English proficiency",
-  time_live_denver = "Years in Denver metro", time_live_hood = "Years in neighborhood",
-  ind_female = "Female", ind_married = "Married", ind_prev_married = "Previously married",
-  ind_hispanic = "Hispanic", ind_race_white = "Race: White",
-  ind_lpr = "Lawful permanent resident", ind_undocumented = "No official status",
-  ind_imm_other = "DACA/visa/refugee/asylee",
-  pop_density_z = "Population density", housing_density_z = "Housing density",
-  dist_downtown_km_z = "Distance to downtown", pct_poverty_z = "Percent below poverty",
-  pct_non_native_z = "Percent foreign-born", neighborhood_ses_index_z = "Neighborhood SES index",
-  walk_nat_walk_ind_z = "EPA Walkability Index", street_intdensity_z = "Street intersection density",
-  urban_center_nearest_dist_m_z = "Distance to urban center", hudjob_jobs_idx_z = "HUD Jobs Proximity Index",
-  sidewalk_density_800_z = "Sidewalk density", bike_facility_density_800_z = "Bicycle facility density",
-  active_corridor_density_800_z = "Active corridor density", ht_t_ami_z = "Transportation cost",
-  tree_tes_z = "Tree Equity Score", tree_treecanopy_z = "Tree canopy (Tree Equity)",
-  park_acres_half_mile_z = "Park acreage within 800 m", park_nearest_dist_m_z = "Distance to nearest park",
-  lc_800m_tree_canopy_z = "Tree canopy land cover (800 m)", lc_800m_impervious_surfaces_z = "Impervious surface (800 m)",
-  crash_density_800_z = "Crash density", ped_crash_density_800_z = "Pedestrian crash density",
-  bike_crash_density_800_z = "Bicycle crash density", short_trip_zone_share_800_z = "Short-trip opportunity zone share",
-  div_total_diversity_resi_z = "Residential diversity", div_exposure_mean_z = "Experienced diversity",
-  belonging_z = "Neighborhood belonging", zone_adu_yes = "ADU permitted",
-  pfa_share_800_z = "Pedestrian focus area share",
-  zone_categoryRes_medhigh = "Zoning: residential medium-high",
-  zone_categoryMixedUse = "Zoning: mixed use", zone_categoryNonres = "Zoning: nonresidential"
-)
+if (!exists("WB_LABELS")) source("wb_labels.R")
+LBL <- WB_LABELS
 lab <- function(x) ifelse(x %in% names(LBL), LBL[x], x)
 
 stars <- function(p) ifelse(is.na(p), "",
@@ -303,6 +294,19 @@ for (i in seq_along(TABLES)) {
   doc <- officer::body_add_par(doc, "")
 }
 print(doc, target = file.path(out_tab, "Manuscript_Tables.docx"))
+
+# Machine-readable map from these table numbers to their place in the submitted
+# manuscript, so the numbering can be checked without reading this file.
+readr::write_csv(
+  data.frame(
+    table_here = 1:10,
+    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S2", "SI Table S3",
+                   "SI Table S5", "SI Table S6", "SI Table S7", "Main text Table 2",
+                   "Main text Table 3", "SI Table S4"),
+    title = TITLES
+  ),
+  file.path(out_tab, "table_numbering.csv")
+)
 
 cat("\nWrote", length(TABLES), "tables to", out_tab, "\n")
 for (i in seq_along(TABLES))
