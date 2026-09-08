@@ -83,18 +83,23 @@ VARS <- rbind(
   V("ind_undocumented", "No official status (undocumented)",      "0/1", "Individual characteristics", "binary"),
   V("ind_imm_other",    "DACA, student/work visa, refugee, asylee", "0/1", "Individual characteristics", "binary"),
 
-  # ---- neighborhood socioeconomic context ----------------------------------
-  V("pop_density",            "Population density",     "persons/km\u00b2",       "Neighborhood socioeconomic context"),
-  V("housing_density",        "Housing density",        "housing units/km\u00b2", "Neighborhood socioeconomic context"),
-  V("dist_downtown_km",       "Distance to downtown Denver", "km",           "Neighborhood socioeconomic context"),
-  V("pct_poverty",            "Population below poverty",    "%",            "Neighborhood socioeconomic context"),
-  V("pct_non_native",         "Foreign-born population",     "%",            "Neighborhood socioeconomic context"),
-  V("neighborhood_ses_index", "Neighborhood SES index",      "index",        "Neighborhood socioeconomic context"),
+  # ---- neighborhood demographics (controls) ---------------------------------
+  V("pct_poverty",            "Population below poverty",    "%",     "Neighborhood demographics"),
+  V("pct_non_native",         "Foreign-born population",     "%",     "Neighborhood demographics"),
+  V("neighborhood_ses_index", "Neighborhood SES index",      "index", "Neighborhood demographics"),
+  V("pct_nh_white",           "Non-Hispanic white population", "%",   "Neighborhood demographics"),
+  V("div_total_diversity_resi", "Residential diversity",     "index, 0-1", "Neighborhood demographics"),
+  V("div_exposure_mean",        "Experienced diversity",     "index, 0-1", "Neighborhood demographics"),
 
-  # ---- urban form -----------------------------------------------------------
-  V("walk_nat_walk_ind",          "EPA National Walkability Index", "index, 1-20",           "Urban form"),
-  V("street_intdensity",          "Street intersection density",    "intersections/sq mile", "Urban form"),
-  V("urban_center_nearest_dist_m","Distance to nearest urban center", "m",                   "Urban form"),
+  # ---- density, location and urban form -------------------------------------
+  V("pop_density",                "Population density",       "persons/km\u00b2",       "Density, location and urban form"),
+  V("housing_density",            "Housing density",          "housing units/km\u00b2", "Density, location and urban form"),
+  V("pct_multifamily",            "Share of multifamily housing", "% of units",      "Density, location and urban form"),
+  V("dist_downtown_km",           "Distance to downtown Denver",  "km",              "Density, location and urban form"),
+  V("urban_center_nearest_dist_m","Distance to nearest urban center", "m",           "Density, location and urban form"),
+  V("walk_nat_walk_ind",          "EPA National Walkability Index",   "index, 1-20", "Density, location and urban form"),
+  V("street_intdensity",          "Street intersection density", "intersections/sq mile", "Density, location and urban form"),
+  V("short_trip_zone_share_800",  "Short-trip opportunity zone share, 800 m", "share of buffer", "Density, location and urban form"),
 
   # ---- transportation and accessibility -------------------------------------
   V("hudjob_jobs_idx",             "HUD Jobs Proximity Index",    "index, 0-100", "Transportation and accessibility"),
@@ -103,21 +108,21 @@ VARS <- rbind(
   V("active_corridor_density_800", "Active corridor density, 800 m",  "m/km\u00b2",    "Transportation and accessibility"),
   V("ht_t_ami",                    "Transportation cost at area median income", "% of income", "Transportation and accessibility"),
 
-  # ---- greenness and parks --------------------------------------------------
-  V("tree_tes",                    "Tree Equity Score",                 "score, 0-100", "Greenness and parks"),
-  V("tree_treecanopy",             "Tree canopy share (Tree Equity)",   "share, 0-1",   "Greenness and parks"),
-  V("park_acres_half_mile",        "Park acreage within 800 m",         "acres",        "Greenness and parks"),
-  V("park_nearest_dist_m",         "Distance to nearest park",          "m",            "Greenness and parks"),
-  V("lc_800m_tree_canopy",         "Tree canopy land cover, 800 m",     "share of buffer", "Greenness and parks"),
-  V("lc_800m_impervious_surfaces", "Impervious surface land cover, 800 m", "share of buffer", "Greenness and parks"),
+  # ---- green space ----------------------------------------------------------
+  V("tree_tes",                    "Tree Equity Score",                 "score, 0-100", "Green space"),
+  V("tree_treecanopy",             "Tree canopy share (Tree Equity)",   "share, 0-1",   "Green space"),
+  V("park_acres_half_mile",        "Park acreage within 800 m",         "acres",        "Green space"),
+  V("park_nearest_dist_m",         "Distance to nearest park",          "m",            "Green space"),
+  V("lc_800m_tree_canopy",         "Tree canopy land cover, 800 m",     "share of buffer", "Green space"),
+  V("ndvi_800",                    "NDVI, 800 m",                       "index, -1 to 1",  "Green space"),
 
-  # ---- safety and social environment ----------------------------------------
-  V("crash_density_800",        "Crash density, 800 m",            "crashes/km\u00b2",     "Safety and social environment"),
-  V("ped_crash_density_800",    "Pedestrian crash density, 800 m", "crashes/km\u00b2",     "Safety and social environment"),
-  V("bike_crash_density_800",   "Bicycle crash density, 800 m",    "crashes/km\u00b2",     "Safety and social environment"),
-  V("short_trip_zone_share_800","Short-trip opportunity zone share, 800 m", "share of buffer", "Safety and social environment"),
-  V("div_total_diversity_resi", "Residential diversity",           "index, 0-1",      "Safety and social environment"),
-  V("div_exposure_mean",        "Experienced diversity",           "index, 0-1",      "Safety and social environment"),
+  # ---- safety and environmental quality -------------------------------------
+  V("crash_density_800",           "Crash density, 800 m",            "crashes/km\u00b2", "Safety and environmental quality"),
+  V("ped_crash_density_800",       "Pedestrian crash density, 800 m", "crashes/km\u00b2", "Safety and environmental quality"),
+  V("bike_crash_density_800",      "Bicycle crash density, 800 m",    "crashes/km\u00b2", "Safety and environmental quality"),
+  V("lc_800m_impervious_surfaces", "Impervious surface land cover, 800 m", "share of buffer", "Safety and environmental quality"),
+  V("env_pm25",                    "Fine particle pollution (PM2.5)", "\u00b5g/m\u00b3", "Safety and environmental quality"),
+  V("env_npl_proximity",           "Proximity to Superfund (NPL) sites", "index",       "Safety and environmental quality"),
 
   # ---- land use and regulation ----------------------------------------------
   V("zone_category",   "Zoning category",                     "category", "Land use and regulation", "categorical"),
@@ -128,6 +133,16 @@ VARS <- rbind(
 GROUPS <- unique(VARS$group)
 
 missing_vars <- setdiff(VARS$name, names(dat))
+NEW_OPTIONAL <- c("ndvi_800", "pct_multifamily", "pct_nh_white",
+                  "env_pm25", "env_npl_proximity")
+not_yet <- intersect(missing_vars, NEW_OPTIONAL)
+if (length(not_yet)) {
+  message("13_descriptives_all.R: ", paste(not_yet, collapse = ", "),
+          " are not in the data yet (run 20_new_variables.R, and 21_ndvi.R for ",
+          "NDVI); leaving them out of the appendix.")
+  VARS <- VARS[!VARS$name %in% not_yet, ]
+  missing_vars <- setdiff(missing_vars, not_yet)
+}
 if (length(missing_vars)) {
   stop("13_descriptives_all.R: these registry variables are absent from the ",
        "derived data:\n  ", paste(missing_vars, collapse = ", "),
@@ -136,11 +151,15 @@ if (length(missing_vars)) {
 
 # Anything the models use that the registry forgot. Better a loud failure here
 # than a silently incomplete appendix.
+# Registered in wb_domains.R but absent from the data -- NDVI before 21_ndvi.R
+# has run, for instance -- is not a registry gap: no model contains it. Only
+# variables that exist in the derived frame can be missing from the appendix.
 model_side <- setdiff(
   unique(c(obj$individual_controls, obj$context_vars, unlist(obj$domain_vars),
            "swb_index", "belonging_index")),
   VARS$name
 )
+model_side <- intersect(model_side, names(dat))
 if (length(model_side)) {
   stop("13_descriptives_all.R: variables used in the models but missing from ",
        "the registry:\n  ", paste(model_side, collapse = ", "))

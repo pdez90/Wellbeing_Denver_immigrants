@@ -19,6 +19,7 @@
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
 if (!exists("WB_LABELS")) source("wb_labels.R")
+if (!exists(".wb_domains_loaded")) source("wb_domains.R")
 wb_require(c("readr", "dplyr"))
 
 fig_dir <- file.path(out_dir, "figures")
@@ -31,34 +32,36 @@ co <- readr::read_csv(file.path(out_dir, "all_model_coefficients.csv"),
 # Which coefficient comes from which model
 # -----------------------------------------------------------------------------
 
+# Panel A: the individual characteristics and the neighborhood demographic
+# controls. Panel B: the five built-environment domains. Both follow
+# wb_domains.R, so re-categorising there re-draws this figure.
+
+zname <- function(v) paste0(v, "_z")
+
 PANEL_A <- list(
   "Individual characteristics" = c(
     "age", "children", "income_hh", "edu_level", "engl_speak",
     "time_live_denver", "time_live_hood", "ind_female", "ind_married",
     "ind_prev_married", "ind_hispanic", "ind_race_white", "ind_lpr",
     "ind_undocumented", "ind_imm_other"),
-  "Neighborhood socioeconomic context" = c(
-    "pop_density_z", "housing_density_z", "dist_downtown_km_z",
-    "pct_poverty_z", "pct_non_native_z", "neighborhood_ses_index_z")
+  "Neighborhood demographics" = zname(WB_CONTROL_VARS)
 )
 A_MODEL <- c(swb = "SWB: + neighborhood context", bel = "Belonging: + neighborhood context")
 
-PANEL_B <- list(
-  "Urban form" = list(model = "urban_form", terms = c(
-    "walk_nat_walk_ind_z", "street_intdensity_z", "urban_center_nearest_dist_m_z")),
-  "Transportation and accessibility" = list(model = "access_transport", terms = c(
-    "hudjob_jobs_idx_z", "sidewalk_density_800_z", "bike_facility_density_800_z",
-    "active_corridor_density_800_z", "ht_t_ami_z")),
-  "Greenness and parks" = list(model = "green_parks", terms = c(
-    "tree_tes_z", "tree_treecanopy_z", "park_acres_half_mile_z",
-    "park_nearest_dist_m_z", "lc_800m_tree_canopy_z", "lc_800m_impervious_surfaces_z")),
-  "Safety and social environment" = list(model = "safety_social", terms = c(
-    "crash_density_800_z", "ped_crash_density_800_z", "bike_crash_density_800_z",
-    "short_trip_zone_share_800_z", "div_total_diversity_resi_z", "div_exposure_mean_z")),
-  "Land use and regulation" = list(model = "land_use", terms = c(
-    "zone_categoryResidential, medium-high density", "zone_categoryMixed use",
-    "zone_categoryNonresidential", "zone_adu_yes", "pfa_share_800_z"))
-)
+# zone_category is a factor; lm() names its contrasts by pasting the level on,
+# and zone_adu_yes stays unstandardised, so the land use domain is spelled out.
+domain_terms <- function(d) {
+  v <- WB_DOMAIN_VARS[[d]]
+  if (d == "land_use") {
+    return(c("zone_categoryResidential, medium-high density", "zone_categoryMixed use",
+             "zone_categoryNonresidential", "zone_adu_yes", "pfa_share_800_z"))
+  }
+  ifelse(v == "zone_adu_yes", v, zname(v))
+}
+
+PANEL_B <- stats::setNames(
+  lapply(names(WB_DOMAIN_VARS), function(d) list(model = d, terms = domain_terms(d))),
+  unname(WB_DOMAIN_LABELS))
 
 lab_of <- function(term) {
   # zoning dummies arrive with the factor level glued on
@@ -79,6 +82,13 @@ rows <- list()
 add <- function(panel, group, term, swb_model, bel_model) {
   s <- pick(swb_model, term); b <- pick(bel_model, term)
   if (is.null(s) && is.null(b)) {
+    if (term %in% c("ndvi_800_z", "pct_multifamily_z", "pct_nh_white_z",
+                    "env_pm25_z", "env_npl_proximity_z")) {
+      message("14_figure_coefficients.R: '", term, "' is not in the model output ",
+              "yet; skipping that row. Run 20_new_variables.R (and 21_ndvi.R for ",
+              "NDVI), then 08.")
+      return(invisible(NULL))
+    }
     stop("14_figure_coefficients.R: term '", term, "' not found in ",
          swb_model, " or ", bel_model,
          ". The model specification and this figure have drifted apart.")

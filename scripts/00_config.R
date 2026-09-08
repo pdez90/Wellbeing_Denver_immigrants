@@ -138,13 +138,30 @@ wb_files <- list(
   s02_enviro      = "respondents_with_acs_enviro_zoning_sld_walkability_jobs_landcover.csv",
   s03_tree_parks  = "respondents_with_all_built_environment_tree_parks.csv",
   s04_transport   = "respondents_with_full_transport_connectivity_crash_urban_density.csv",
-  s05_final       = "respondents_with_transport_ht_segpoi_stoz_diversity.csv"
+  s05_final       = "respondents_with_transport_ht_segpoi_stoz_diversity.csv",
+  s06_newvars     = "respondents_with_new_variables.csv"
 )
 
 wb_path <- function(key) file.path(out_dir, wb_files[[key]])
 
+# The six counties of the Denver metropolitan study area. Script 01 used to
+# define this locally; it lives here now because 20_new_variables.R needs the
+# same list for its ACS pulls, and two copies could drift.
+WB_METRO_COUNTIES <- c("Denver", "Adams", "Arapahoe", "Jefferson", "Douglas",
+                       "Broomfield")
+if (!exists("metro_counties")) metro_counties <- WB_METRO_COUNTIES
+
 # The file every analysis script reads.
-analysis_file <- wb_path("s05_final")
+#
+# 20_new_variables.R adds the measures agreed in September 2026 (percent
+# non-Hispanic white, share of multifamily housing, PM2.5, Superfund proximity
+# and NDVI) to script 05's output and writes s06. Whenever that file exists it
+# is the analysis file; until it does, the pipeline reads s05 exactly as before.
+analysis_file <- if (file.exists(wb_path("s06_newvars"))) {
+  wb_path("s06_newvars")
+} else {
+  wb_path("s05_final")
+}
 
 # -----------------------------------------------------------------------------
 # 4. Small helpers used across scripts

@@ -19,6 +19,8 @@
 # =============================================================================
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
+if (!exists(".wb_domains_loaded")) source("wb_domains.R")
+if (!exists("WB_LABELS")) source("wb_labels.R")
 wb_require(wb_packages_analysis)
 
 obj <- readRDS(file.path(out_dir, "model_objects.rds"))
@@ -47,41 +49,27 @@ med_covars <- med_covars[med_covars %in% names(model_dat)]
 
 stopifnot(length(med_covars) == length(unique(med_covars)))
 
-predictor_labels <- c(
-  walk_nat_walk_ind_z          = "EPA Walkability Index",
-  sidewalk_density_800_z       = "Sidewalk density",
-  bike_facility_density_800_z  = "Bicycle facility density",
-  tree_tes_z                   = "Tree Equity Score",
-  tree_treecanopy_z            = "Tree canopy (Tree Equity)",
-  park_acres_half_mile_z       = "Park acreage within 800 m",
-  crash_density_800_z          = "Crash density",
-  bike_crash_density_800_z     = "Bicycle crash density",
-  pfa_share_800_z              = "Pedestrian focus area share",
-  zone_adu_yes                 = "ADU permitted in zone"
-)
+# Which exposures are tested, and what they are called. Both follow the
+# categories in wb_domains.R: every term that entered the integrated model,
+# plus the two regulatory measures, which are of interest whether or not they
+# reached significance in their own domain. The Holm correction below is
+# applied across however many rows this produces.
 
-domain_labels <- c(
-  urban_form       = "Urban form",
-  access_transport = "Transportation",
-  green_parks      = "Greenness and parks",
-  safety_social    = "Safety and neighborhood environment",
-  land_use         = "Land use and regulation"
-)
+predictor_labels <- stats::setNames(
+  vapply(names(WB_LABELS), function(k) unname(WB_LABELS[[k]]), character(1)),
+  names(WB_LABELS))
 
-mediation_candidates <- tibble::tribble(
-  ~domain,            ~predictor,
-  "urban_form",       "walk_nat_walk_ind_z",
-  "access_transport", "sidewalk_density_800_z",
-  "access_transport", "bike_facility_density_800_z",
-  "green_parks",      "tree_tes_z",
-  "green_parks",      "tree_treecanopy_z",
-  "green_parks",      "park_acres_half_mile_z",
-  "safety_social",    "crash_density_800_z",
-  "safety_social",    "bike_crash_density_800_z",
-  "land_use",         "pfa_share_800_z",
-  "land_use",         "zone_adu_yes"
+domain_labels <- WB_DOMAIN_LABELS
+
+mediation_candidates <- tibble::tibble(
+  predictor = wb_mediation_candidates(obj$final_be, model_dat)
 ) %>%
-  dplyr::filter(predictor %in% names(model_dat))
+  dplyr::mutate(domain = vapply(predictor, wb_domain_of, character(1))) %>%
+  dplyr::select(domain, predictor) %>%
+  dplyr::filter(!is.na(domain))
+
+cat("\nMediation: testing", nrow(mediation_candidates), "exposures\n")
+print(as.data.frame(mediation_candidates), row.names = FALSE)
 
 empty_med_row <- function(domain_name, treat_var, msg = NA_character_) {
   tibble::tibble(

@@ -42,7 +42,40 @@ Total on-disk size is roughly 9 GB, dominated by the DRCOG land-cover raster.
 | `short_trip_opportunity_zones/*.shp` | 05 | DRCOG short-trip opportunity zones. |
 | `htaindex2019_data_blkgrps_08.csv` | 05 | CNT Housing + Transportation Affordability Index, 2019, Colorado block groups. |
 | `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Zhou & Lu (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. |
-| `diversity_CO.csv` | 05 | Residential and experienced diversity, Colorado. |
+| `diversity_CO.csv` | 05 | Residential and experienced racial-ethnic diversity, Colorado census tracts. Xu, W., Wang, Z., Attia, N., Attia, Y., Zhang, Y., & Zong, H. (2024). "An experienced racial-ethnic diversity dataset in the United States using human mobility data." *Scientific Data*, 11, 638. doi:10.1038/s41597-024-03490-y; deposited at https://doi.org/10.17605/OSF.IO/X94GJ as state-level CSV and GeoJSON files. |
+
+## Note on `diversity_CO.csv`
+
+The Colorado state file from Xu et al. (2024), keyed by `GEOID10` (2010 census
+tract) with one row per tract x `interval` x `weekday` combination.
+
+Both diversity columns are interaction indices bounded by 0 and 1 — the
+probability that two people drawn at random from the tract differ in race or
+ethnicity:
+
+    D_it = 1 - Σ_j [ n_jit ( n_jit - 1 ) ] / [ N_it ( N_it - 1 ) ]
+
+`total_diversity_resi` evaluates that over the tract's **resident** population
+from the 2020 Census. `total_diversity_exp` evaluates it over the people
+**present** in the tract, computed from mobile-device location data at
+geohash-8 resolution in 15-minute steps, then aggregated to five time-of-day
+intervals (late night, morning, afternoon, evening, late evening) and to
+weekday / weekend, for representative weeks in March, June, September and
+December 2022. `diff` is experienced minus residential. Group-specific columns
+(`white_diversity_exp`, `black_diversity_exp`, `asian_diversity_exp`,
+`hispanic_diversity_exp`, `other_diversity_exp`) are not used here.
+
+Script 05 keeps one static row per tract for the residential and demographic
+columns and averages `total_diversity_exp` across interval and weekday to give
+`div_exposure_mean`, one value per tract. Both `div_total_diversity_resi` and
+`div_exposure_mean` enter the safety and social environment domain models, and
+`div_exposure_mean` also enters the integrated model. Neither is significant in
+any specification.
+
+**Vintage mismatch.** The survey is from 2019; the residential composition is
+2020 Census and the mobility weeks are 2022. These measures are therefore
+treated as stable characteristics of the tract rather than as exposure
+contemporaneous with the interview, and the manuscript says so.
 
 ## Note on `seg_poi.csv`
 

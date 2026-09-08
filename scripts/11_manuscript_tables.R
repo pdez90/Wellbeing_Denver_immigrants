@@ -48,6 +48,7 @@ wb_require(c("tidyverse", "janitor", "readr", "car", "flextable", "officer"))
 out_tab <- file.path(out_dir, "manuscript_tables")
 dir.create(out_tab, showWarnings = FALSE, recursive = TRUE)
 
+if (!exists(".wb_domains_loaded")) source("wb_domains.R")
 obj <- readRDS(file.path(out_dir, "model_objects.rds"))
 model_dat           <- obj$model_dat
 individual_controls <- obj$individual_controls
@@ -180,8 +181,10 @@ names(T2) <- c("Variable", "N", "Mean", "SD", "Min", "Median", "Max")
 # Tables 3-8: regression models
 # -----------------------------------------------------------------------------
 IC <- individual_controls
-dnames <- c("urban_form", "access_transport", "green_parks", "safety_social")
-dhdr   <- c("Urban form", "Transportation", "Greenness & parks", "Safety & social")
+# The four non-regulatory domains, in the order wb_domains.R lists them; the
+# land use domain gets its own table below.
+dnames <- setdiff(names(domain_z), "land_use")
+dhdr   <- unname(WB_DOMAIN_LABELS_SHORT[dnames])
 
 T3 <- coef_table(list(
   make_lm("swb_z", IC, model_dat), make_lm("swb_z", c(IC, context_z), model_dat),
@@ -211,9 +214,7 @@ T8 <- coef_table(list(
 med_file <- file.path(out_dir, "formal_mediation_results_domain_models.csv")
 if (!file.exists(med_file)) stop("Run 09_mediation.R before this script: ", med_file, " not found.")
 med <- readr::read_csv(med_file, show_col_types = FALSE)
-dom_lab <- c(urban_form = "Urban form", access_transport = "Transportation",
-             green_parks = "Greenness and parks", safety_social = "Safety and environment",
-             land_use = "Land use")
+dom_lab <- WB_DOMAIN_LABELS
 T9 <- med %>%
   dplyr::transmute(
     Domain = dplyr::recode(domain, !!!dom_lab, .default = domain),

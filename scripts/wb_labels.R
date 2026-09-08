@@ -32,5 +32,15 @@ WB_LABELS <- c(
   # these keys must match the level strings in collapse_zone() exactly.
   `zone_categoryResidential, medium-high density` = "Zoning: residential, medium-high density",
   `zone_categoryMixed use` = "Zoning: mixed use",
-  `zone_categoryNonresidential` = "Zoning: nonresidential"
+  `zone_categoryNonresidential` = "Zoning: nonresidential",
+
+  # ---- added Sep 2026 with the re-categorised domains ------------------------
+  pct_nh_white_z      = "Percent non-Hispanic white",
+  pct_multifamily_z   = "Share of multifamily housing",
+  ndvi_800_z          = "NDVI (800 m)",
+  ndvi_400_z          = "NDVI (400 m)",
+  ndvi_1600_z         = "NDVI (1,600 m)",
+  env_pm25_z          = "PM2.5",
+  env_ozone_z         = "Ozone",
+  env_npl_proximity_z = "Proximity to Superfund (NPL) sites"
 )

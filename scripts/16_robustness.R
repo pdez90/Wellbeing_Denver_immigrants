@@ -64,19 +64,36 @@ star <- function(p) ifelse(is.na(p), "", ifelse(p < .001, "***", ifelse(p < .01,
 cellfmt <- function(b, se, p) sprintf("%.3f%s (%.3f)", b, star(p), se)
 
 # Terms the paper actually makes claims about.
-HEADLINE <- c(
-  walk_nat_walk_ind_z           = "EPA Walkability Index",
-  bike_facility_density_800_z   = "Bicycle facility density",
+#
+# This list used to be written out by hand, and when the categories changed in
+# September 2026 it silently stopped covering the main finding: distance to the
+# nearest urban center entered the integrated model and carried the mediation
+# result, but was never checked against clustered or spatial standard errors.
+# It is now built from the model objects, so whatever the integrated model
+# selects is always checked. That matters most for exposures that are smooth
+# functions of geography -- distance to a downtown or an urban center is the
+# clearest case -- because their residuals are exactly the kind that ordinary
+# standard errors treat as independent and are not.
+HEADLINE_EXTRA <- c(
   sidewalk_density_800_z        = "Sidewalk density",
-  park_acres_half_mile_z        = "Park acreage within 800 m",
   lc_800m_tree_canopy_z         = "Tree canopy land cover",
   crash_density_800_z           = "Crash density",
-  bike_crash_density_800_z      = "Bicycle crash density",
   belonging_z                   = "Neighborhood belonging",
   ind_undocumented              = "No official status (undocumented)",
   ind_hispanic                  = "Hispanic",
   pct_poverty_z                 = "Percent below poverty"
 )
+
+lab_for <- function(term) {
+  if (!is.na(WB_LABELS[term])) unname(WB_LABELS[term]) else term
+}
+
+# every term the integrated model selected, plus the standing list above
+HEADLINE <- stats::setNames(vapply(FBE, lab_for, character(1)), FBE)
+HEADLINE <- c(HEADLINE, HEADLINE_EXTRA[!names(HEADLINE_EXTRA) %in% names(HEADLINE)])
+
+cat("\nTerms checked for clustering and spatial dependence:\n  ",
+    paste(unname(HEADLINE), collapse = "; "), "\n", sep = "")
 
 # -----------------------------------------------------------------------------
 # 1. Common-sample sensitivity

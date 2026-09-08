@@ -29,6 +29,7 @@
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
 if (!exists("WB_LABELS")) source("wb_labels.R")
+if (!exists(".wb_domains_loaded")) source("wb_domains.R")
 wb_require(c("tidyverse", "readr", "broom"))
 
 obj <- readRDS(file.path(out_dir, "model_objects.rds"))
@@ -58,8 +59,16 @@ EXPOSURES <- list(
   lc_tree_canopy          = list(src = "lc_{r}m_tree_canopy",          how = "as_is"),
   lc_impervious           = list(src = "lc_{r}m_impervious_surfaces",  how = "as_is"),
   short_trip_zone_share   = list(src = "short_trip_zone_share_{r}",    how = "as_is"),
-  pfa_share               = list(src = "pfa_share_{r}",                how = "as_is")
+  pfa_share               = list(src = "pfa_share_{r}",                how = "as_is"),
+  ndvi                    = list(src = "ndvi_{r}",                     how = "as_is")
 )
+
+# NDVI is only present once 21_ndvi.R has been run; drop it rather than stop.
+if (!"ndvi_800" %in% names(dat)) {
+  EXPOSURES$ndvi <- NULL
+  message("15_buffer_sensitivity.R: no NDVI columns, so NDVI is left out of the ",
+          "radius comparison. Run 21_ndvi.R and 20_new_variables.R to include it.")
+}
 
 build_radius <- function(r) {
   out <- list()
@@ -103,28 +112,40 @@ for (i in seq_along(CHECKS)) {
 # `varying` are the exposures swapped across radii; `fixed` are model terms with
 # no radius, carried through unchanged.
 
+# Domains follow wb_domains.R. `varying` are the exposures rebuilt at each
+# radius; `fixed` are terms in the same domain with no radius to vary.
+has <- function(v) v[v %in% names(dat)]
+zn  <- function(v) paste0(v, "_z")
+
 SPECS <- list(
+  density_location = list(
+    label   = WB_DOMAIN_LABELS[["density_location"]],
+    varying = c("short_trip_zone_share"),
+    fixed   = zn(has(c("pop_density", "housing_density", "pct_multifamily",
+                       "dist_downtown_km", "urban_center_nearest_dist_m",
+                       "walk_nat_walk_ind", "street_intdensity"))),
+    stored  = c("short_trip_zone_share_800")),
   access_transport = list(
-    label   = "Transportation and accessibility",
+    label   = WB_DOMAIN_LABELS[["access_transport"]],
     varying = c("sidewalk_density", "bike_facility_density", "active_corridor_density"),
-    fixed   = c("hudjob_jobs_idx_z", "ht_t_ami_z"),
+    fixed   = zn(has(c("hudjob_jobs_idx", "ht_t_ami"))),
     stored  = c("sidewalk_density_800", "bike_facility_density_800",
                 "active_corridor_density_800")),
-  green_parks = list(
-    label   = "Greenness and parks",
-    varying = c("lc_tree_canopy", "lc_impervious"),
-    fixed   = c("tree_tes_z", "tree_treecanopy_z", "park_acres_half_mile_z",
-                "park_nearest_dist_m_z"),
-    stored  = c("lc_800m_tree_canopy", "lc_800m_impervious_surfaces")),
-  safety_social = list(
-    label   = "Safety and social environment",
+  green_space = list(
+    label   = WB_DOMAIN_LABELS[["green_space"]],
+    varying = c("lc_tree_canopy", if ("ndvi" %in% names(EXPOSURES)) "ndvi"),
+    fixed   = zn(has(c("tree_tes", "tree_treecanopy", "park_acres_half_mile",
+                       "park_nearest_dist_m"))),
+    stored  = c("lc_800m_tree_canopy", if ("ndvi" %in% names(EXPOSURES)) "ndvi_800")),
+  safety_env = list(
+    label   = WB_DOMAIN_LABELS[["safety_env"]],
     varying = c("crash_density", "ped_crash_density", "bike_crash_density",
-                "short_trip_zone_share"),
-    fixed   = c("div_total_diversity_resi_z", "div_exposure_mean_z"),
+                "lc_impervious"),
+    fixed   = zn(has(c("env_pm25", "env_npl_proximity"))),
     stored  = c("crash_density_800", "ped_crash_density_800", "bike_crash_density_800",
-                "short_trip_zone_share_800")),
+                "lc_800m_impervious_surfaces")),
   land_use = list(
-    label   = "Land use and regulation",
+    label   = WB_DOMAIN_LABELS[["land_use"]],
     varying = c("pfa_share"),
     fixed   = c("zone_category", "zone_adu_yes"),
     stored  = c("pfa_share_800"))

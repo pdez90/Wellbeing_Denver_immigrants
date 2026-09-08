@@ -26,6 +26,7 @@
 # =============================================================================
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
+if (!exists(".wb_domains_loaded")) source("wb_domains.R")
 wb_require(wb_packages_analysis)
 
 dat <- readr::read_csv(analysis_file, show_col_types = FALSE) %>%
@@ -167,44 +168,25 @@ individual_controls <- c(
   names(demographic_labels)
 )
 
-context_vars <- c("pop_density", "housing_density", "dist_downtown_km",
-                  "pct_poverty", "pct_non_native", "neighborhood_ses_index")
+# -----------------------------------------------------------------------------
+# 3. Controls and domains
+# -----------------------------------------------------------------------------
+# Both lists live in wb_domains.R, which every downstream script also reads, so
+# the categories in the models, the tables, the figures and the appendix cannot
+# drift apart. See that file for what moved and why.
 
-domain_vars <- list(
-  urban_form = c(
-    "walk_nat_walk_ind",            # EPA National Walkability Index
-    "street_intdensity",            # NaNDA intersection density (see NOTE on units)
-    "urban_center_nearest_dist_m"
-  ),
-  access_transport = c(
-    "hudjob_jobs_idx",
-    "sidewalk_density_800",
-    "bike_facility_density_800",
-    "active_corridor_density_800",
-    "ht_t_ami"                      # H+T transportation cost, % of income at AMI
-  ),
-  green_parks = c(
-    "tree_tes",                     # Tree Equity Score
-    "tree_treecanopy",              # Tree Equity canopy share  (collinear with tree_tes,
-    "park_acres_half_mile",         #   r = .89 -- see VIF output below)
-    "park_nearest_dist_m",
-    "lc_800m_tree_canopy",          # DRCOG landcover canopy in 800 m buffer
-    "lc_800m_impervious_surfaces"
-  ),
-  safety_social = c(
-    "crash_density_800",
-    "ped_crash_density_800",
-    "bike_crash_density_800",
-    "short_trip_zone_share_800",
-    "div_total_diversity_resi",
-    "div_exposure_mean"
-  ),
-  # ---- NEW DOMAIN -----------------------------------------------------------
-  # Regulatory land use and pedestrian planning designations. Built by scripts
-  # 02 (zoning shapefile overlay) and 04 (pedestrian focus areas) and, until
-  # now, never used in a model.
-  land_use = c("zone_adu_yes", "pfa_share_800")
-)
+context_vars <- WB_CONTROL_VARS
+domain_vars  <- WB_DOMAIN_VARS
+
+registered <- unique(c(context_vars, unlist(domain_vars)))
+absent <- setdiff(registered, c(names(dat), "zone_adu_yes"))
+if (length(absent)) {
+  cat("\nNOTE: these registered variables are not in the analysis file and will\n",
+      "      be dropped from their category for this run:\n        ",
+      paste(absent, collapse = ", "), "\n",
+      "      (ndvi_800 appears here until 21_ndvi.R and 20_new_variables.R have\n",
+      "      both been run; the others should not.)\n", sep = "")
+}
 
 # Zoning is categorical, so it is handled separately from the z-scored numerics.
 collapse_zone <- function(x) {
@@ -294,10 +276,16 @@ for (d in names(domain_z)) {
     make_lm("swb_z", unique(c("belonging_z", rhs_domain)), model_dat)
 }
 
-final_be <- c("walk_nat_walk_ind_z", "bike_facility_density_800_z",
-              "park_acres_half_mile_z", "tree_tes_z", "crash_density_800_z",
-              "short_trip_zone_share_800_z", "div_exposure_mean_z")
+# The integrated model takes the strongest term from each domain. The rule is
+# in wb_domains.R and it prints what it selected, so the synthesis model can be
+# traced back to the domain models rather than resting on a hand-written list.
+final_be <- select_final_be(model_dat, individual_controls, context_z, domain_z)
+final_be_report <- attr(final_be, "report")
+if (!is.null(final_be_report)) {
+  readr::write_csv(final_be_report, file.path(out_dir, "integrated_model_selection.csv"))
+}
 final_be <- final_be[final_be %in% names(model_dat)]
+cat("\nIntegrated model terms:", paste(final_be, collapse = ", "), "\n")
 
 final_models <- list(
   "SWB: final BE model"       = make_lm("swb_z",       unique(c(individual_controls, context_z, final_be)), model_dat),
