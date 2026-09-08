@@ -17,7 +17,12 @@
 # =============================================================================
 
 args <- commandArgs(trailingOnly = TRUE)
-analysis_only <- "--analysis" %in% args
+# Respect an analysis_only set by the caller, e.g.
+#   Rscript -e 'analysis_only <- TRUE; source("run_all.R")'
+# Before this guard that assignment was silently overwritten and the slow
+# spatial stage re-ran anyway.
+if (!exists("analysis_only")) analysis_only <- FALSE
+analysis_only <- isTRUE(analysis_only) || "--analysis" %in% args
 
 source("00_config.R")
 
@@ -31,18 +36,26 @@ spatial_scripts <- c(
 )
 
 analysis_scripts <- c(
+  # 21 (NDVI) is deliberately NOT in this list: it downloads imagery and takes
+  # the best part of an hour on a first run. Run it once by hand, then
+  # 20_new_variables.R picks up ndvi_by_respondent.csv on every later run.
+  "20_new_variables.R",
   "07_tables_descriptive.R",
   "08_domain_models.R",
   "09_mediation.R",
   "10_greenness_sensitivity.R",
   "11_manuscript_tables.R",
   "12_figure_mediation_dag.R",
+  "23_figure_framework.R",
+  "24_variable_table.R",
   "13_descriptives_all.R",
   "14_figure_coefficients.R",
   "15_buffer_sensitivity.R",
   "16_robustness.R",
   "17_graphical_abstract.R",
-  "18_si_maps.R"
+  "18_si_maps.R",
+  "19_figure_integrated_model.R",
+  "22_mediation_sensitivity.R"
 )
 
 scripts <- if (analysis_only) analysis_scripts else c(spatial_scripts, analysis_scripts)
