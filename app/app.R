@@ -291,8 +291,14 @@ server <- function(input, output, session) {
     bb <- sf::st_bbox(geo$metro)
     m %>% fitBounds(bb[["xmin"]], bb[["ymin"]], bb[["xmax"]], bb[["ymax"]])
   })
+  # The map tab is hidden at start-up, so the leaflet widget is created only
+  # when the tab is first opened. Draw only once the widget exists (it reports
+  # its zoom), otherwise the first layer is sent to a map that is not there yet.
+  # A reactiveVal changes once, so later zooming does not trigger a redraw.
+  map_ready <- reactiveVal(FALSE)
+  observe({ req(input$map_zoom); if (!isolate(map_ready())) map_ready(TRUE) })
   observe({
-    req(geo, input$map_layer)
+    req(geo, input$map_layer, map_ready())
     proxy <- leafletProxy("map") %>% clearGroup("layer") %>% clearControls()
     if (input$map_layer == "counts") {
       g <- geo$tracts[!is.na(geo$tracts$label), ]
