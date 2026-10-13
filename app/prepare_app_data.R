@@ -9,9 +9,11 @@
 # aggregate: respondent counts by tract, suppressed below MIN_CELL. The one
 # file in the pipeline that holds respondent rows
 # (model_data_domain_models.csv) is never copied, and the analysis file is
-# read here only to count respondents per tract. No block-group layer is
-# built: a set of polygons drawn only where respondents live would disclose
-# residence at block-group resolution, finer than the suppression rule.
+# read here only to count respondents per tract. The area-level layers are
+# built from the public source files for EVERY tract and block group in the
+# six metro counties, never from respondent rows: a set of polygons drawn
+# only where respondents live would disclose residence at block-group
+# resolution, finer than the suppression rule.
 #
 # Run from the repository root. Needs internet the first time for the
 # census geometry (tigris caches it).
@@ -26,7 +28,7 @@ if (!dir.exists(app_dir)) stop("Run from the repository root; app/ not found.")
 dir.create(file.path(app_dir, "data"), showWarnings = FALSE)
 dir.create(file.path(app_dir, "www"),  showWarnings = FALSE)
 
-need <- c("dplyr", "readr", "sf", "tigris", "janitor")
+need <- c("dplyr", "readr", "purrr", "sf", "tigris", "janitor", "tidycensus")
 miss <- need[!vapply(need, requireNamespace, logical(1), quietly = TRUE)]
 if (length(miss)) stop("Install first: install.packages(c(", paste0('"', miss, '"', collapse = ", "), "))")
 suppressPackageStartupMessages({ library(dplyr); library(readr); library(sf) })
@@ -97,18 +99,116 @@ co  <- tigris::counties(state = "CO", cb = TRUE, year = 2019, progress_bar = FAL
 metro <- co[co$NAME %in% metro_names, ] %>% st_transform(4326) %>% select(NAME)
 tr  <- tigris::tracts(state = "CO", cb = TRUE, year = 2019, progress_bar = FALSE) %>% st_transform(4326)
 metro_fips <- unique(co$COUNTYFP[co$NAME %in% metro_names])
-tr_metro <- tr[tr$COUNTYFP %in% metro_fips, c("GEOID")] %>%
+# A respondent tract that matches no Colorado tract means a GEOID problem
+# (padding, vintage), so stop. A tract that matches but lies outside the six
+# metro counties is a respondent living just beyond them: keep it on the map.
+unmatched <- setdiff(counts$tract_geoid, tr$GEOID)
+if (length(unmatched)) stop(length(unmatched), " respondent tract(s) match no 2019 Colorado tract, e.g. ", unmatched[1])
+outside <- setdiff(counts$tract_geoid, tr$GEOID[tr$COUNTYFP %in% metro_fips])
+if (length(outside)) message("  ", length(outside), " respondent tract(s) lie outside the six metro counties; kept")
+tr_metro <- tr[tr$COUNTYFP %in% metro_fips | tr$GEOID %in% counts$tract_geoid, c("GEOID")] %>%
   left_join(counts, by = c("GEOID" = "tract_geoid"))
-if (sum(!is.na(tr_metro$label)) != nrow(counts)) stop("some respondent tracts did not join the census geometry")
+
+# ---- 3. Public area-level layers for every unit in the six counties ---------
+# Each source is read in full from its public file (or the Census API) and
+# joined to census geometry of its own vintage. A source that fails is skipped
+# with a message rather than stopping the build.
+message("Building public area-level layers (all metro tracts and block groups)")
+bg10 <- tigris::block_groups(state = "CO", cb = TRUE, year = 2019, progress_bar = FALSE) %>%   # 2010 geography
+  filter(COUNTYFP %in% metro_fips) %>% st_transform(4326) %>% select(GEOID, ALAND)
+bg20 <- tigris::block_groups(state = "CO", cb = TRUE, year = 2020, progress_bar = FALSE) %>%   # 2020 geography
+  filter(COUNTYFP %in% metro_fips) %>% st_transform(4326) %>% select(GEOID)
+tr_layers <- tr[tr$COUNTYFP %in% metro_fips, c("GEOID")]
+area_vars <- list()
+add_layer <- function(layer, col, lab, unit, geo) {
+  area_vars[[length(area_vars) + 1]] <<- list(col = col, lab = lab, unit = unit, layer = layer, geo = geo)
+}
+try_src <- function(what, expr) tryCatch(expr, error = function(e) { message("  skipped ", what, ": ", conditionMessage(e)); NULL })
+metro_cty <- c("Denver", "Adams", "Arapahoe", "Jefferson", "Douglas", "Broomfield")
+
+# ACS 2015-2019 (needs the Census API key that script 01 uses)
+acs_bg <- try_src("ACS block groups", purrr::map_dfr(metro_cty, function(cn) tidycensus::get_acs(
+  geography = "block group", state = "CO", county = cn, year = 2019, survey = "acs5", output = "wide",
+  variables = c(pop = "B01003_001", pov_tot = "C17002_001", pov_lt50 = "C17002_002", pov_50_99 = "C17002_003",
+                race_tot = "B03002_001", nh_white = "B03002_003"))))
+if (!is.null(acs_bg)) {
+  acs_bg <- acs_bg %>% transmute(GEOID,
+    acs_pct_poverty = 100 * (pov_lt50E + pov_50_99E) / pov_totE,
+    acs_pct_nh_white = 100 * nh_whiteE / race_totE, acs_pop = popE)
+  bg10 <- bg10 %>% left_join(acs_bg, by = "GEOID") %>%
+    mutate(acs_pop_density = ifelse(ALAND > 0, acs_pop / (ALAND / 1e6), NA_real_))
+  add_layer("bg10", "acs_pop_density",  "Population density",            "persons per sq km, block group (ACS 2015-2019)", "block group")
+  add_layer("bg10", "acs_pct_poverty",  "Population below poverty",      "%, block group (ACS 2015-2019)", "block group")
+  add_layer("bg10", "acs_pct_nh_white", "Non-Hispanic white population", "%, block group (ACS 2015-2019)", "block group")
+}
+acs_tr <- try_src("ACS tracts", purrr::map_dfr(metro_cty, function(cn) tidycensus::get_acs(
+  geography = "tract", state = "CO", county = cn, year = 2019, survey = "acs5", output = "wide",
+  variables = c(nat_tot = "B05012_001", fborn = "B05012_003"))))
+if (!is.null(acs_tr)) {
+  tr_layers <- tr_layers %>% left_join(acs_tr %>% transmute(GEOID, acs_pct_foreign_born = 100 * fbornE / nat_totE), by = "GEOID")
+  add_layer("tr", "acs_pct_foreign_born", "Foreign-born population", "%, tract (ACS 2015-2019)", "tract")
+}
+
+# EPA National Walkability Index (2010 block groups)
+walk <- try_src("Walkability Index", {
+  gdb <- src("WalkabilityIndex", "Natl_WI.gdb"); lyr <- sf::st_layers(gdb)$name[1]
+  w <- sf::st_read(gdb, layer = lyr, quiet = TRUE,
+                   query = sprintf("SELECT * FROM \"%s\" WHERE STATEFP = '08'", lyr)) %>% st_drop_geometry()
+  gcol <- intersect(c("GEOID10", "GEOID20", "GEOID"), names(w))[1]
+  data.frame(GEOID = pad(w[[gcol]], 12), walk_index = as.numeric(w$NatWalkInd))
+})
+if (!is.null(walk)) {
+  bg10 <- bg10 %>% left_join(walk, by = "GEOID")
+  add_layer("bg10", "walk_index", "EPA National Walkability Index", "index 1-20, block group (EPA 2021)", "block group")
+}
+
+# HUD Jobs Proximity Index, Colorado EnviroScreen and Tree Equity Score (2020 block groups)
+jobs <- try_src("Jobs Proximity Index", {
+  f <- list.files(data_dir, pattern = "^Jobs_Proximity_Index.*\\.csv$", full.names = TRUE)[1]
+  readr::read_csv(f, col_types = readr::cols(GEOID = "c", .default = "?"), show_col_types = FALSE) %>%
+    filter(STUSAB == "CO") %>% transmute(GEOID = pad(GEOID, 12), jobs_idx = as.numeric(jobs_idx))
+})
+if (!is.null(jobs)) {
+  bg20 <- bg20 %>% left_join(jobs, by = "GEOID")
+  add_layer("bg20", "jobs_idx", "HUD Jobs Proximity Index", "index 0-100, block group (HUD 2020)", "block group")
+}
+env <- try_src("EnviroScreen", {
+  e <- readr::read_csv(src("Enviroscreen.csv"), col_types = readr::cols(GEOID = "c", .default = "?"), show_col_types = FALSE)
+  pm <- grep("^Fine Particle Pollution \\(", names(e), value = TRUE)[1]
+  npl <- grep("^Proximity to National Priorities List Sites$", names(e), value = TRUE)[1]
+  data.frame(GEOID = pad(e$GEOID, 12), env_pm25 = as.numeric(e[[pm]]), env_npl = as.numeric(e[[npl]]))
+})
+if (!is.null(env)) {
+  bg20 <- bg20 %>% left_join(env, by = "GEOID")
+  add_layer("bg20", "env_pm25", "Fine particle pollution (PM2.5)", "\u00b5g/m\u00b3, block group (Colorado EnviroScreen)", "block group")
+  add_layer("bg20", "env_npl",  "Superfund (NPL) site proximity",  "index, block group (Colorado EnviroScreen)", "block group")
+}
+tes <- try_src("Tree Equity Score", {
+  t <- sf::st_read(src("co_shp", "co_tes.shp"), quiet = TRUE) %>% st_drop_geometry()
+  data.frame(GEOID = pad(t$GEOID, 12), tree_tes = as.numeric(t$tes), tree_canopy = 100 * as.numeric(t$treecanopy))
+})
+if (!is.null(tes)) {
+  bg20 <- bg20 %>% left_join(tes, by = "GEOID")
+  add_layer("bg20", "tree_tes",    "Tree Equity Score",  "score 0-100, block group (urban areas only; American Forests)", "block group")
+  add_layer("bg20", "tree_canopy", "Tree canopy (Tree Equity)", "% of block group (urban areas only; American Forests)", "block group")
+}
+for (v in area_vars) {
+  g <- switch(v$layer, bg10 = bg10, bg20 = bg20, tr = tr_layers)
+  message(sprintf("  %-32s %d of %d units with a value", v$lab, sum(!is.na(g[[v$col]])), nrow(g)))
+}
 
 # simplify for a light map
-tr_metro <- st_simplify(tr_metro, dTolerance = 30, preserveTopology = TRUE)
-metro    <- st_simplify(metro,    dTolerance = 50, preserveTopology = TRUE)
+tr_metro  <- st_simplify(tr_metro,  dTolerance = 30, preserveTopology = TRUE)
+tr_layers <- st_simplify(tr_layers, dTolerance = 30, preserveTopology = TRUE)
+bg10      <- st_simplify(select(bg10, -any_of(c("ALAND", "acs_pop"))), dTolerance = 30, preserveTopology = TRUE)
+bg20      <- st_simplify(bg20, dTolerance = 30, preserveTopology = TRUE)
+metro     <- st_simplify(metro, dTolerance = 50, preserveTopology = TRUE)
 
 saveRDS(list(metro = metro, tracts = tr_metro, min_cell = MIN_CELL,
+             layers = list(tr = tr_layers, bg10 = bg10, bg20 = bg20), area_vars = area_vars,
              built = format(Sys.time(), "%Y-%m-%d")), dst("geo.rds"))
 
-# ---- 3. A manifest, so the privacy claim is checkable -----------------------
+# ---- 4. A manifest, so the privacy claim is checkable -----------------------
 files <- list.files(file.path(app_dir, "data"), recursive = TRUE)
 writeLines(c("# Files the app reads. None contains a respondent row.",
              paste0("- ", files)), file.path(app_dir, "data", "MANIFEST.md"))

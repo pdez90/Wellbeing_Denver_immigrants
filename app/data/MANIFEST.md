@@ -21,6 +21,7 @@
 - geo.rds
 - greenness_sensitivity.csv
 - integrated_model_selection.csv
+- MANIFEST.md
 - mediation_sensitivity.csv
 - model_fit_summary.csv
 - rebuild_verification.csv

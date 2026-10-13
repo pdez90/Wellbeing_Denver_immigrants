@@ -149,7 +149,10 @@ ui <- navbarPage(
   tabPanel("Map",
     sidebarLayout(
       sidebarPanel(width = 3,
-        p(class = "note", if (!is.null(geo)) sprintf("Respondent counts are shown by census tract and suppressed where fewer than %d respondents live in a tract; no residential location is mapped, and no layer is drawn at a finer geography than the tract. Area-level measures are mapped in Figure S12 of the Supplementary Information.", geo$min_cell) else "geo.rds not found; run app/prepare_app_data.R.")),
+        if (!is.null(geo)) selectInput("map_layer", "Layer", choices = as.list(c(
+          "Respondents per census tract" = "counts",
+          if (length(geo$area_vars)) setNames(vapply(geo$area_vars, `[[`, "", "col"), vapply(geo$area_vars, `[[`, "", "lab"))))),
+        p(class = "note", if (!is.null(geo)) sprintf("Respondent counts are shown by census tract and suppressed where fewer than %d respondents live in a tract; no residential location is mapped. The other layers are public area-level measures drawn for every tract or block group in the six metro counties from the original public sources, so they say nothing about where respondents live.", geo$min_cell) else "geo.rds not found; run app/prepare_app_data.R.")),
       mainPanel(width = 9, leafletOutput("map", height = "640px"))
     )
   ),
@@ -289,14 +292,27 @@ server <- function(input, output, session) {
     m %>% fitBounds(bb[["xmin"]], bb[["ymin"]], bb[["xmax"]], bb[["ymax"]])
   })
   observe({
-    req(geo)
-    g <- geo$tracts[!is.na(geo$tracts$label), ]
-    pal <- colorBin("Blues", domain = g$n_shown, bins = 4, na.color = "#DCDCDC")
-    leafletProxy("map") %>% clearGroup("layer") %>% clearControls() %>%
-      addPolygons(data = g, group = "layer", fillColor = ~pal(n_shown), fillOpacity = .75, color = "white", weight = .5,
-                  label = ~paste0("Tract ", GEOID, ": ", label, " respondents")) %>%
-      addLegend("bottomright", pal = pal, values = g$n_shown, title = "Respondents per tract",
-                na.label = sprintf("fewer than %d", geo$min_cell))
+    req(geo, input$map_layer)
+    proxy <- leafletProxy("map") %>% clearGroup("layer") %>% clearControls()
+    if (input$map_layer == "counts") {
+      g <- geo$tracts[!is.na(geo$tracts$label), ]
+      pal <- colorBin("Blues", domain = g$n_shown, bins = 4, na.color = "#DCDCDC")
+      proxy %>% addPolygons(data = g, group = "layer", fillColor = ~pal(n_shown), fillOpacity = .75, color = "white", weight = .5,
+                            label = ~paste0("Tract ", GEOID, ": ", label, " respondents")) %>%
+        addLegend("bottomright", pal = pal, values = g$n_shown, title = "Respondents per tract",
+                  na.label = sprintf("fewer than %d", geo$min_cell))
+    } else {
+      v <- Filter(function(x) x$col == input$map_layer, geo$area_vars)[[1]]
+      g <- geo$layers[[v$layer]]
+      g <- g[!is.na(g[[v$col]]), ]
+      x <- g[[v$col]]
+      brks <- unique(stats::quantile(x, probs = seq(0, 1, .2), na.rm = TRUE, names = FALSE))
+      pal <- if (length(brks) >= 3) colorBin("YlGnBu", domain = x, bins = brks) else colorNumeric("YlGnBu", domain = x)
+      proxy %>% addPolygons(data = g, group = "layer", fillColor = pal(x), fillOpacity = .75, color = "white", weight = .3,
+                            label = paste0(v$lab, ": ", signif(x, 3))) %>%
+        addLegend("bottomright", pal = pal, values = x,
+                  title = paste0(v$lab, "<br><small>", v$unit, if (length(brks) >= 3) ", quintiles" else "", "</small>"))
+    }
   })
 
   output$var_tbl <- renderDT({

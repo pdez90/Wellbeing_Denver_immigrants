@@ -39,5 +39,5 @@ are not tracked in git; regenerate them from the data folder.
 - Integrated model and mediation, with the confounding sensitivity.
 - Sensitivity checks: buffer radius, greenness specification, common sample, spatial standard errors, robust regression, item overlap.
 - Descriptives: every variable group with its distribution panel.
-- Map: respondents per tract (suppressed < 5). Nothing is drawn at a finer geography than the tract; area-level measures are in Figure S12.
+- Map: respondents per tract (suppressed < 5), and public area-level measures (ACS, EPA Walkability, HUD Jobs Proximity, EnviroScreen, Tree Equity) for every tract or block group in the six counties, built from the source files rather than from respondent rows. `prepare_app_data.R` needs the Census API key that script 01 uses.
 - Variables: definitions, units, geography, vintage and source.
