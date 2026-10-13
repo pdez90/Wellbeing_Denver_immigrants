@@ -41,3 +41,11 @@ sessionInfo.txt
 
 # renv lockfile is tracked
 !renv.lock
+
+# Reference values for 25_verify_rebuild.R are tracked despite the data rules above
+!reference/
+!reference/*.csv
+
+# Shiny explorer: generated inputs (aggregates only, rebuilt by app/prepare_app_data.R)
+app/data/
+app/www/

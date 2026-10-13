@@ -195,6 +195,13 @@ for (sp_name in names(SPECS)) {
                paste0(sp$varying, "_r", r, "_z"))
       fit <- stats::lm(stats::as.formula(paste(outcome, "~", paste(rhs, collapse = " + "))),
                        data = base[keep, , drop = FALSE])
+      # The comparison across radii is only like-for-like if every radius is
+      # fitted on exactly the respondents selected at 800 m. lm() would silently
+      # drop anyone missing an alternative-radius exposure, so check.
+      if (stats::nobs(fit) != n_fixed) {
+        stop(sprintf("15_buffer_sensitivity.R: %s / %s at %d m fitted on %d respondents, not the %d selected at 800 m; an alternative-radius exposure is missing for some respondents.",
+                     sp$label, outcome, r, stats::nobs(fit), n_fixed), call. = FALSE)
+      }
       td  <- broom::tidy(fit)
       for (v in sp$varying) {
         term <- paste0(v, "_r", r, "_z")
@@ -228,7 +235,8 @@ LABEL <- c(sidewalk_density = "Sidewalk density",
            lc_tree_canopy = "Tree canopy land cover",
            lc_impervious = "Impervious surface",
            short_trip_zone_share = "Short-trip opportunity zone share",
-           pfa_share = "Pedestrian focus area share")
+           pfa_share = "Pedestrian focus area share",
+           ndvi = "NDVI")
 
 cellfmt <- function(d) sprintf("%.3f%s (%.3f)", d$estimate, stars(d$p_value), d$std_error)
 

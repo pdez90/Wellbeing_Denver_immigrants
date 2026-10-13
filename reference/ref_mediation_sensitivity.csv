@@ -1,0 +1,7 @@
+Exposure,N,ACME,rho*,R2 residual,R2 total
+Distance to urban center,304,0.088,0.36,0.130,0.082
+Bicycle facility density,304,0.045,0.37,0.137,0.087
+Park acreage within 800 m,304,0.049,0.37,0.137,0.089
+Bicycle crash density,304,-0.004,0.39,0.152,0.099
+Pedestrian focus area share,304,-0.014,0.39,0.152,0.101
+ADU permitted,245,-0.131,0.42,0.176,0.104

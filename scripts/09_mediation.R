@@ -32,9 +32,17 @@ set.seed(WB_SEED)
 # -----------------------------------------------------------------------------
 # Covariate set
 # -----------------------------------------------------------------------------
-# The mediation models use the SAME confounder set as the domain models in
-# 08_domain_models.R, so Table 9 is directly comparable to Tables 4-8 and is
-# estimated on the same respondents.
+# Each mediation model contains ONE exposure plus the individual characteristics
+# and the neighborhood demographic controls -- the specification of the
+# integrated model, not of the domain models. The other measures in the
+# exposure's domain are not held fixed, and because fewer variables are
+# required, the complete-case sample (n = 304; 245 for ADU) is larger than the
+# domain samples (238/245). The confounder set is the same; the specification
+# and the respondents are not identical, and the paper says so.
+#
+# The four non-regulatory exposures were selected by their domain-model
+# significance (wb_domains.R, select_final_be), so this analysis is exploratory:
+# the Holm correction covers the tests run, not the search that chose them.
 #
 # This is possible because 08 collapses the categorical demographic controls
 # into binary indicators computed once on the full sample. Entered as factors,
@@ -195,11 +203,12 @@ ft8 <- flextable::flextable(table8) %>%
     "effect. Indirect effects estimated using 1,000 nonparametric bootstrap simulations",
     sprintf("(seed = %d).", WB_SEED),
     "Continuous built-environment variables are standardized. Mediation models adjust for",
-    "the same covariate set as the domain models in Tables 4-8: age, number of children,",
-    "household income, education, English proficiency, years in the Denver metro area,",
-    "years in the current neighborhood, demographic indicators, and neighborhood",
-    "socioeconomic context. Holm-adjusted p-values account for testing ten indirect",
-    "effects."
+    "the individual characteristics and neighborhood demographic controls of the integrated",
+    "model (age, number of children, household income, education, English proficiency, years",
+    "in the Denver metro area, years in the current neighborhood, demographic indicators, and",
+    "neighborhood demographics); each model contains a single exposure. Exposures were selected",
+    "by their domain-model significance, so the analysis is exploratory; Holm-adjusted p-values",
+    sprintf("account for the %d indirect effects tested, not for that selection.", nrow(table8))
   ))
 
 doc8 <- officer::read_docx() %>%

@@ -36,19 +36,18 @@ model_dat           <- obj$model_dat
 individual_controls <- obj$individual_controls
 context_z           <- obj$context_z
 
+# The baseline is the green space domain exactly as 08_domain_models.R fitted it
+# (read from the saved model objects, so the two cannot disagree); the other
+# specifications remove only the intended Tree Equity measure(s). Specification
+# D drops both and so recovers the respondents that Tree Equity coverage
+# excludes.
+green_base <- obj$domain_z$green_space
+if (is.null(green_base)) stop("10_greenness_sensitivity.R: model_objects.rds has no green_space domain; re-run 08.")
 specs <- list(
-  "A. Both Tree Equity measures (current)" = c(
-    "tree_tes_z", "tree_treecanopy_z", "park_acres_half_mile_z",
-    "park_nearest_dist_m_z", "lc_800m_tree_canopy_z", "lc_800m_impervious_surfaces_z"),
-  "B. Tree Equity Score only" = c(
-    "tree_tes_z", "park_acres_half_mile_z",
-    "park_nearest_dist_m_z", "lc_800m_tree_canopy_z", "lc_800m_impervious_surfaces_z"),
-  "C. Tree Equity canopy only" = c(
-    "tree_treecanopy_z", "park_acres_half_mile_z",
-    "park_nearest_dist_m_z", "lc_800m_tree_canopy_z", "lc_800m_impervious_surfaces_z"),
-  "D. Land-cover canopy only" = c(
-    "park_acres_half_mile_z", "park_nearest_dist_m_z",
-    "lc_800m_tree_canopy_z", "lc_800m_impervious_surfaces_z")
+  "A. Both Tree Equity measures (as in the domain model)" = green_base,
+  "B. Tree Equity Score only"  = setdiff(green_base, "tree_treecanopy_z"),
+  "C. Tree Equity canopy only" = setdiff(green_base, "tree_tes_z"),
+  "D. Land-cover canopy only"  = setdiff(green_base, c("tree_tes_z", "tree_treecanopy_z"))
 )
 
 fit_spec <- function(outcome, greenness_vars) {

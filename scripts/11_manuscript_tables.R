@@ -229,15 +229,15 @@ T9 <- med %>%
 # -----------------------------------------------------------------------------
 # Table 10: greenness sensitivity
 # -----------------------------------------------------------------------------
+# The baseline is the green space domain as 08 fitted it (from the saved model
+# objects, so this table and 10_greenness_sensitivity.R cannot disagree with
+# the domain model or with each other); B-D remove only the Tree Equity terms.
+green_base <- obj$domain_z$green_space
 specs <- list(
-  "A. Both Tree Equity measures" = c("tree_tes_z","tree_treecanopy_z","park_acres_half_mile_z",
-    "park_nearest_dist_m_z","lc_800m_tree_canopy_z","lc_800m_impervious_surfaces_z"),
-  "B. Tree Equity Score only" = c("tree_tes_z","park_acres_half_mile_z","park_nearest_dist_m_z",
-    "lc_800m_tree_canopy_z","lc_800m_impervious_surfaces_z"),
-  "C. Tree Equity canopy only" = c("tree_treecanopy_z","park_acres_half_mile_z","park_nearest_dist_m_z",
-    "lc_800m_tree_canopy_z","lc_800m_impervious_surfaces_z"),
-  "D. Land-cover canopy only" = c("park_acres_half_mile_z","park_nearest_dist_m_z",
-    "lc_800m_tree_canopy_z","lc_800m_impervious_surfaces_z"))
+  "A. Both Tree Equity measures" = green_base,
+  "B. Tree Equity Score only"    = setdiff(green_base, "tree_treecanopy_z"),
+  "C. Tree Equity canopy only"   = setdiff(green_base, "tree_tes_z"),
+  "D. Land-cover canopy only"    = setdiff(green_base, c("tree_tes_z", "tree_treecanopy_z")))
 max_green_vif <- function(m, gv) {
   v <- try(car::vif(m), silent = TRUE); if (inherits(v, "try-error")) return(NA_real_)
   vv <- if (is.matrix(v)) stats::setNames(v[, "GVIF"]^(1 / v[, "Df"]), rownames(v)) else stats::setNames(as.numeric(v), names(v))

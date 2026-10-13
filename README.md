@@ -165,9 +165,22 @@ and immigration status runs naturalized citizen = 0 through work visa = 7.
 Reference categories are never married and naturalized U.S. citizen. See
 `demographic_labels` in `08_domain_models.R`.
 
-**Mediation covariate set.** The mediation models use the same covariate set and
-the same analytic samples as the domain models, so main-text Table 3 is directly
-comparable to the domain models in SI Tables S15, S17 and S18.
+**Mediation specification.** Each mediation model contains a single exposure
+plus the individual characteristics and neighborhood demographic controls --
+the specification of the integrated model, not of the domain models -- and is
+estimated on the complete cases for those variables (n = 304; 245 for ADU
+permissibility). The confounder set matches the domain models; the other
+measures in the exposure's domain are not held fixed, and the sample is larger
+than the domain samples. The four non-regulatory exposures are chosen by their
+domain-model significance (`select_final_be()` in `wb_domains.R`), so the
+integrated model and the mediation analysis are exploratory syntheses of the
+domain results, and the paper describes them as such.
+
+**Verification.** `scripts/25_verify_rebuild.R` compares a re-run against the
+published values in `reference/` (tracked in git despite the `*.csv` rule). It
+distinguishes exact reproduction at the published precision from agreement
+within tolerance, counts an absent output file as a missing check rather than
+skipping it, and exits with status 1 on any drift or missing check.
 
 **Model specifications are strict.** `make_lm()` stops if a requested predictor
 is missing or constant, rather than fitting a reduced model, so an upstream join

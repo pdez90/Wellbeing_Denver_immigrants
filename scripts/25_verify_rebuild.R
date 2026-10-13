@@ -66,32 +66,34 @@ TOL_DESC_REL <- 0.02     # 2 per cent, for spreads and sample sizes
 TOL_DESC_SD  <- 0.05     # 5 per cent of a standard deviation, for means
 TOL_EFFECT   <- 0.02     # 0.02 SD on an ACME or a coefficient
 TOL_RHO      <- 0.03
+TOL_P        <- 0.02     # bootstrap p-values move with the resampling; 0.02 is the resolution of 1,000 draws x 20
 
 report <- list()
-# A published figure carries only the precision it was printed with (Table 2
-# gives two decimals). A rebuilt value that rounds to the published figure at
-# that precision therefore reproduces it, whatever the tolerance below says --
-# for small-scale variables (an index with SD 0.04) the rounding step is wider
-# than 5 per cent of the SD, and without this rule a perfect reproduction would
-# be reported as drift.
-printed_dp <- function(x) {
-  s <- sub("0+$", "", format(x, scientific = FALSE, trim = TRUE))
+# A published figure carries only the precision it was printed with. The
+# reference tables are read as character so that precision is taken from the
+# printed string ("0.10" has two decimals; parsing it to 0.1 would lose one),
+# and a rebuilt value that rounds to the published figure at that precision is
+# an exact reproduction. The tolerance test below is applied only to values
+# that do not reproduce exactly, and the verdict records which case applied.
+printed_dp <- function(s) {
+  s <- trimws(as.character(s))
   if (grepl("\\.", s)) nchar(sub(".*\\.", "", s)) else 0L
 }
+num <- function(s) suppressWarnings(as.numeric(as.character(s)))
 add <- function(check, item, published, rebuilt, tol, kind, scale = NA_real_) {
-  ok <- if (is.na(published) || is.na(rebuilt)) NA else {
-    same_at_printed_precision <-
-      abs(round(rebuilt, printed_dp(published)) - published) < 1e-9
-    same_at_printed_precision ||
-    if (kind == "rel")      abs(rebuilt - published) <= tol * max(abs(published), 1e-9)
-    else if (kind == "sd")  abs(rebuilt - published) <= tol * scale
-    else                    abs(rebuilt - published) <= tol
+  pub_dp  <- printed_dp(published)
+  pub     <- num(published)
+  scale   <- num(scale)
+  verdict <- if (is.na(pub) || is.na(rebuilt)) "MISSING" else {
+    exact <- abs(round(rebuilt, pub_dp) - pub) < 1e-9
+    within <- if (kind == "rel")      abs(rebuilt - pub) <= tol * max(abs(pub), 1e-9)
+              else if (kind == "sd")  abs(rebuilt - pub) <= tol * scale
+              else                    abs(rebuilt - pub) <= tol
+    if (exact) "match" else if (within) "within tolerance" else "DRIFT"
   }
   report[[length(report) + 1]] <<- data.frame(
-    check = check, item = item, published = published, rebuilt = rebuilt,
-    difference = rebuilt - published,
-    verdict = if (is.na(ok)) "MISSING" else if (ok) "match" else "DRIFT",
-    stringsAsFactors = FALSE)
+    check = check, item = item, published = pub, rebuilt = rebuilt,
+    difference = rebuilt - pub, verdict = verdict, stringsAsFactors = FALSE)
 }
 
 # -----------------------------------------------------------------------------
@@ -149,7 +151,7 @@ cat("This runs before any model. A drift here is a changed input, not a changed\
 cat("estimate, and it is the reason to look at the source rather than the model.\n\n")
 
 t2 <- readr::read_csv(ref_path("ref_T2_built_environment_descriptives.csv"),
-                      show_col_types = FALSE)
+                      show_col_types = FALSE, col_types = readr::cols(.default = "c"))
 dat <- readr::read_csv(analysis_file, show_col_types = FALSE)
 
 for (v in names(T2_MAP)) {
@@ -173,7 +175,8 @@ for (v in names(T2_MAP)) {
 cat("=== Check 2: mediation results against published Table 9 ===\n\n")
 med_new <- file.path(out_dir, "formal_mediation_results_domain_models.csv")
 if (file.exists(med_new)) {
-  ref9 <- readr::read_csv(ref_path("ref_T9_mediation.csv"), show_col_types = FALSE)
+  ref9 <- readr::read_csv(ref_path("ref_T9_mediation.csv"), show_col_types = FALSE,
+                          col_types = readr::cols(.default = "c"))
   got  <- readr::read_csv(med_new, show_col_types = FALSE)
   got$label <- vapply(got$predictor, function(p) {
     k <- paste0(p, "_z"); if (!is.na(WB_LABELS[k])) unname(WB_LABELS[k])
@@ -186,9 +189,21 @@ if (file.exists(med_new)) {
         if (nrow(g)) g$acme[1] else NA_real_, TOL_EFFECT, "abs")
     add("mediation", paste0(lab, " [n]"), ref9$N[i],
         if (nrow(g)) g$n[1] else NA_real_, 0.02, "rel")
+    add("mediation", paste0(lab, " [ADE]"), ref9$`Direct effect (ADE)`[i],
+        if (nrow(g)) g$ade[1] else NA_real_, TOL_EFFECT, "abs")
+    add("mediation", paste0(lab, " [total]"), ref9$`Total effect`[i],
+        if (nrow(g)) g$total_effect[1] else NA_real_, TOL_EFFECT, "abs")
+    add("mediation", paste0(lab, " [ACME p]"), ref9$`ACME p`[i],
+        if (nrow(g)) g$acme_p[1] else NA_real_, TOL_P, "abs")
+    add("mediation", paste0(lab, " [ACME p Holm]"), ref9$`ACME p (Holm)`[i],
+        if (nrow(g)) g$acme_p_holm[1] else NA_real_, TOL_P, "abs")
   }
 } else {
   cat("  formal_mediation_results_domain_models.csv not found -- run 09 first.\n\n")
+  ref9 <- readr::read_csv(ref_path("ref_T9_mediation.csv"), show_col_types = FALSE,
+                          col_types = readr::cols(.default = "c"))
+  for (i in seq_len(nrow(ref9)))
+    add("mediation", paste0(ref9$Predictor[i], " [ACME]"), ref9$`Indirect effect (ACME)`[i], NA_real_, TOL_EFFECT, "abs")
 }
 
 # -----------------------------------------------------------------------------
@@ -197,7 +212,8 @@ if (file.exists(med_new)) {
 cat("=== Check 3: mediation sensitivity (rho*) ===\n\n")
 sens_new <- file.path(out_dir, "mediation_sensitivity.csv")
 if (file.exists(sens_new)) {
-  refs <- readr::read_csv(ref_path("ref_mediation_sensitivity.csv"), show_col_types = FALSE)
+  refs <- readr::read_csv(ref_path("ref_mediation_sensitivity.csv"), show_col_types = FALSE,
+                          col_types = readr::cols(.default = "c"))
   gots <- readr::read_csv(sens_new, show_col_types = FALSE)
   for (i in seq_len(nrow(refs))) {
     g <- gots[gots$label == refs$Exposure[i], ]
@@ -206,6 +222,10 @@ if (file.exists(sens_new)) {
   }
 } else {
   cat("  mediation_sensitivity.csv not found -- run 22 first.\n\n")
+  refs <- readr::read_csv(ref_path("ref_mediation_sensitivity.csv"), show_col_types = FALSE,
+                          col_types = readr::cols(.default = "c"))
+  for (i in seq_len(nrow(refs)))
+    add("sensitivity", paste0(refs$Exposure[i], " [rho*]"), refs$`rho*`[i], NA_real_, TOL_RHO, "abs")
 }
 
 # -----------------------------------------------------------------------------
@@ -220,8 +240,15 @@ missing <- R[R$verdict == "MISSING", ]
 cat("\n========================================================================\n")
 cat("VERIFICATION SUMMARY\n")
 cat("========================================================================\n")
-cat(sprintf("  %d checks: %d match, %d drift, %d missing\n",
-            nrow(R), sum(R$verdict == "match"), nrow(drift), nrow(missing)))
+within <- R[R$verdict == "within tolerance", ]
+cat(sprintf("  %d checks: %d reproduce the published figure exactly, %d within tolerance, %d drift, %d missing\n",
+            nrow(R), sum(R$verdict == "match"), nrow(within), nrow(drift), nrow(missing)))
+if (nrow(within)) {
+  cat("\n-- Within tolerance but not an exact reproduction ------------------------\n")
+  w <- within
+  w$published <- sprintf("%.4g", w$published); w$rebuilt <- sprintf("%.4g", w$rebuilt)
+  print(w[, c("check", "item", "published", "rebuilt")], row.names = FALSE)
+}
 
 if (nrow(drift)) {
   cat("\n-- Drifted --------------------------------------------------------------\n")
@@ -256,9 +283,15 @@ if (nrow(missing)) {
   cat(paste("   ", unique(missing$item), collapse = "\n"), "\n")
 }
 
-if (!nrow(drift) && !nrow(missing)) {
-  cat("\n  Every check matched. The rebuild reproduces the manuscript.\n")
+if (!nrow(drift) && !nrow(missing) && !nrow(within)) {
+  cat("\n  Every check reproduces the published figure exactly.\n")
+} else if (!nrow(drift) && !nrow(missing)) {
+  cat("\n  No drift and nothing missing; see the within-tolerance list above.\n")
 }
+
+# A verification that found drift or could not run a check is a failure, so
+# that a pipeline calling this script cannot report success by accident.
+if (nrow(drift) || nrow(missing)) quit(status = 1)
 
 cat("\nWrote rebuild_verification.csv\n")
 cat("\nA reminder on how to read this. Matching descriptives with a moved\n")

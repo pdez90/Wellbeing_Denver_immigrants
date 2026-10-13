@@ -1,0 +1,59 @@
+domain,outcome,term,n_reported,reported,n_common,common_sample,change
+density_location,Subjective well-being,Distance to urban center,238,0.208* (0.095),189,0.074 (0.108),-0.134
+density_location,Subjective well-being,No official status (undocumented),238,0.157 (0.222),189,0.213 (0.225),+0.056
+density_location,Subjective well-being,Hispanic,238,-0.003 (0.197),189,-0.094 (0.217),-0.091
+density_location,Subjective well-being,Percent below poverty,238,0.084 (0.085),189,0.058 (0.088),-0.026
+density_location,Neighborhood belonging,Distance to urban center,238,0.294*** (0.084),189,0.339** (0.104),+0.045
+density_location,Neighborhood belonging,No official status (undocumented),238,0.413* (0.198),189,0.429+ (0.217),+0.016
+density_location,Neighborhood belonging,Hispanic,238,0.385* (0.176),189,0.202 (0.209),-0.183
+density_location,Neighborhood belonging,Percent below poverty,238,0.290*** (0.076),189,0.262** (0.085),-0.027
+access_transport,Subjective well-being,Bicycle facility density,238,0.244** (0.079),189,0.247** (0.094),+0.003
+access_transport,Subjective well-being,Sidewalk density,238,0.103 (0.079),189,-0.003 (0.085),-0.105
+access_transport,Subjective well-being,No official status (undocumented),238,0.191 (0.216),189,0.202 (0.222),+0.011
+access_transport,Subjective well-being,Hispanic,238,0.038 (0.193),189,-0.116 (0.214),-0.155
+access_transport,Subjective well-being,Percent below poverty,238,0.070 (0.086),189,0.073 (0.088),+0.003
+access_transport,Neighborhood belonging,Bicycle facility density,238,0.150* (0.073),189,0.248** (0.091),+0.097
+access_transport,Neighborhood belonging,Sidewalk density,238,0.034 (0.072),189,-0.043 (0.082),-0.077
+access_transport,Neighborhood belonging,No official status (undocumented),238,0.421* (0.198),189,0.423* (0.213),+0.002
+access_transport,Neighborhood belonging,Hispanic,238,0.401* (0.177),189,0.209 (0.206),-0.191
+access_transport,Neighborhood belonging,Percent below poverty,238,0.272*** (0.079),189,0.224** (0.085),-0.048
+green_space,Subjective well-being,Park acreage within 800 m,238,0.166* (0.084),189,0.164+ (0.086),-0.002
+green_space,Subjective well-being,Tree canopy land cover,238,0.074 (0.084),189,0.077 (0.097),+0.003
+green_space,Subjective well-being,No official status (undocumented),238,0.181 (0.222),189,0.228 (0.223),+0.047
+green_space,Subjective well-being,Hispanic,238,-0.004 (0.198),189,-0.129 (0.214),-0.126
+green_space,Subjective well-being,Percent below poverty,238,0.118 (0.089),189,0.141 (0.090),+0.023
+green_space,Neighborhood belonging,Park acreage within 800 m,238,0.162* (0.076),189,0.222** (0.083),+0.059
+green_space,Neighborhood belonging,Tree canopy land cover,238,0.098 (0.076),189,0.148 (0.094),+0.050
+green_space,Neighborhood belonging,No official status (undocumented),238,0.448* (0.200),189,0.462* (0.215),+0.014
+green_space,Neighborhood belonging,Hispanic,238,0.373* (0.179),189,0.203 (0.207),-0.170
+green_space,Neighborhood belonging,Percent below poverty,238,0.320*** (0.080),189,0.267** (0.087),-0.053
+safety_env,Subjective well-being,Bicycle crash density,238,0.423** (0.133),189,0.325* (0.134),-0.099
+safety_env,Subjective well-being,Crash density,238,-0.156 (0.116),189,-0.160 (0.130),-0.004
+safety_env,Subjective well-being,No official status (undocumented),238,0.120 (0.222),189,0.173 (0.226),+0.053
+safety_env,Subjective well-being,Hispanic,238,-0.014 (0.196),189,-0.075 (0.214),-0.061
+safety_env,Subjective well-being,Percent below poverty,238,0.110 (0.086),189,0.065 (0.088),-0.045
+safety_env,Neighborhood belonging,Bicycle crash density,238,0.167 (0.122),189,0.181 (0.129),+0.013
+safety_env,Neighborhood belonging,Crash density,238,-0.096 (0.107),189,-0.264* (0.126),-0.169
+safety_env,Neighborhood belonging,No official status (undocumented),238,0.415* (0.204),189,0.473* (0.219),+0.058
+safety_env,Neighborhood belonging,Hispanic,238,0.403* (0.180),189,0.275 (0.207),-0.128
+safety_env,Neighborhood belonging,Percent below poverty,238,0.298*** (0.079),189,0.222** (0.085),-0.076
+land_use,Subjective well-being,No official status (undocumented),245,0.352+ (0.209),189,0.149 (0.229),-0.203
+land_use,Subjective well-being,Hispanic,245,0.120 (0.195),189,-0.018 (0.225),-0.137
+land_use,Subjective well-being,Percent below poverty,245,-0.006 (0.079),189,0.049 (0.086),+0.055
+land_use,Neighborhood belonging,No official status (undocumented),245,0.453* (0.205),189,0.440* (0.219),-0.014
+land_use,Neighborhood belonging,Hispanic,245,0.253 (0.192),189,0.283 (0.215),+0.030
+land_use,Neighborhood belonging,Percent below poverty,245,0.133+ (0.078),189,0.214* (0.082),+0.081
+integrated,Subjective well-being,Distance to urban center,304,0.143* (0.066),189,0.054 (0.089),-0.089
+integrated,Subjective well-being,Bicycle facility density,304,0.100 (0.065),189,0.182* (0.087),+0.082
+integrated,Subjective well-being,Park acreage within 800 m,304,0.123+ (0.069),189,0.111 (0.081),-0.011
+integrated,Subjective well-being,Bicycle crash density,304,0.131* (0.064),189,0.215+ (0.121),+0.084
+integrated,Subjective well-being,No official status (undocumented),304,0.270 (0.192),189,0.181 (0.223),-0.089
+integrated,Subjective well-being,Hispanic,304,0.139 (0.163),189,-0.113 (0.211),-0.251
+integrated,Subjective well-being,Percent below poverty,304,0.033 (0.074),189,0.071 (0.087),+0.038
+integrated,Neighborhood belonging,Distance to urban center,304,0.201** (0.064),189,0.215* (0.085),+0.014
+integrated,Neighborhood belonging,Bicycle facility density,304,0.081 (0.063),189,0.116 (0.083),+0.035
+integrated,Neighborhood belonging,Park acreage within 800 m,304,0.065 (0.067),189,0.117 (0.078),+0.052
+integrated,Neighborhood belonging,Bicycle crash density,304,-0.028 (0.063),189,0.042 (0.116),+0.070
+integrated,Neighborhood belonging,No official status (undocumented),304,0.496** (0.186),189,0.511* (0.214),+0.014
+integrated,Neighborhood belonging,Hispanic,304,0.392* (0.158),189,0.221 (0.201),-0.171
+integrated,Neighborhood belonging,Percent below poverty,304,0.208** (0.072),189,0.277** (0.083),+0.069

@@ -68,6 +68,8 @@ belonging_items <- c("hood_belong", "hood_trust_people", "hood_borrow", "hood_co
 dat <- dat %>%
   dplyr::mutate(
     dplyr::across(dplyr::any_of(c(swb_items, belonging_items)), to_num),
+    swb_n_items       = rowSums(!is.na(dplyr::across(dplyr::any_of(swb_items)))),
+    belonging_n_items = rowSums(!is.na(dplyr::across(dplyr::any_of(belonging_items)))),
     swb_index       = rowMeans(dplyr::across(dplyr::any_of(swb_items)), na.rm = TRUE),
     belonging_index = rowMeans(dplyr::across(dplyr::any_of(belonging_items)), na.rm = TRUE),
     swb_index       = ifelse(is.nan(swb_index), NA_real_, swb_index),
@@ -75,6 +77,26 @@ dat <- dat %>%
     swb_z           = zscore(swb_index),
     belonging_z     = zscore(belonging_index),
     age             = survey_year - to_num(year_born)
+  )
+
+# Scale scoring rule. A composite is the mean of the items a respondent
+# answered. WB_MIN_ITEMS is the minimum number of answered items for a score to
+# be retained; the default of 1 reproduces the published analysis. The counts
+# printed below show how many respondents each stricter rule would remove, so
+# the choice can be made with the numbers in view (survey: 2 respondents have a
+# single SWB item, 4 have three of six; 5 have two of four belonging items).
+if (!exists("WB_MIN_ITEMS")) WB_MIN_ITEMS <- c(swb = 1, belonging = 1)
+cat("\nScale completeness (number of items answered):\n")
+cat("  SWB (6 items):      "); print(table(dat$swb_n_items[dat$swb_n_items > 0]))
+cat("  Belonging (4 items):"); print(table(dat$belonging_n_items[dat$belonging_n_items > 0]))
+cat(sprintf("  Rule in force: SWB needs >= %d item(s), belonging >= %d item(s).\n",
+            WB_MIN_ITEMS[["swb"]], WB_MIN_ITEMS[["belonging"]]))
+dat <- dat %>%
+  dplyr::mutate(
+    swb_index       = ifelse(swb_n_items       >= WB_MIN_ITEMS[["swb"]],       swb_index,       NA_real_),
+    belonging_index = ifelse(belonging_n_items >= WB_MIN_ITEMS[["belonging"]], belonging_index, NA_real_),
+    swb_z           = zscore(swb_index),
+    belonging_z     = zscore(belonging_index)
   )
 
 cat("\n== Cronbach's alpha: SWB ==\n");       print(psych::alpha(dat[, swb_items]))
@@ -180,12 +202,24 @@ domain_vars  <- WB_DOMAIN_VARS
 
 registered <- unique(c(context_vars, unlist(domain_vars)))
 absent <- setdiff(registered, c(names(dat), "zone_adu_yes"))
-if (length(absent)) {
-  cat("\nNOTE: these registered variables are not in the analysis file and will\n",
-      "      be dropped from their category for this run:\n        ",
-      paste(absent, collapse = ", "), "\n",
-      "      (ndvi_800 appears here until 21_ndvi.R and 20_new_variables.R have\n",
-      "      both been run; the others should not.)\n", sep = "")
+
+# The intended specification is validated here, before any column is filtered,
+# so that a failed upstream join cannot silently shrink the adjustment set and
+# still produce model tables. NDVI is the one predictor that may legitimately
+# be absent (21_ndvi.R is run by hand); every other absence stops the run.
+# Set WB_ALLOW_MISSING_NDVI <- FALSE before sourcing to require it too.
+if (!exists("WB_ALLOW_MISSING_NDVI")) WB_ALLOW_MISSING_NDVI <- TRUE
+optional_absent <- if (WB_ALLOW_MISSING_NDVI) intersect(absent, "ndvi_800") else character(0)
+if (length(optional_absent)) {
+  cat("\nNOTE: ndvi_800 is not in the analysis file and is dropped from the green\n",
+      "      space domain for this run. Run 21_ndvi.R then 20_new_variables.R to\n",
+      "      include it.\n", sep = "")
+}
+if (length(setdiff(absent, optional_absent))) {
+  stop("08_domain_models.R: registered predictors missing from the analysis file: ",
+       paste(setdiff(absent, optional_absent), collapse = ", "),
+       "\n  The specification in wb_domains.R is not satisfiable; fix the upstream\n",
+       "  join rather than letting the model run without these variables.", call. = FALSE)
 }
 
 # Zoning is categorical, so it is handled separately from the z-scored numerics.
@@ -242,7 +276,14 @@ model_dat <- dat %>%
 keep_vars <- names(model_dat)[
   vapply(model_dat, function(x) dplyr::n_distinct(x, na.rm = TRUE) > 1, logical(1))
 ]
-model_dat <- model_dat %>% dplyr::select(dplyr::all_of(keep_vars))
+constant <- setdiff(names(model_dat), keep_vars)
+if (length(constant)) {
+  stop("08_domain_models.R: these predictors are constant on the model sample and\n",
+       "  cannot be estimated: ", paste(constant, collapse = ", "),
+       "\n  A constant predictor means an upstream join failed or a variable was\n",
+       "  miscoded; remove it from wb_domains.R deliberately rather than letting\n",
+       "  the model drop it.", call. = FALSE)
+}
 
 individual_controls <- individual_controls[individual_controls %in% names(model_dat)]
 context_z <- context_z[context_z %in% names(model_dat)]

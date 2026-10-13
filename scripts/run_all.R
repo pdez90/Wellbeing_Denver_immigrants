@@ -72,15 +72,29 @@ run_one <- function(f) {
   ok
 }
 
-results <- vapply(scripts, run_one, logical(1))
+# Every script reads the previous script's output from disk, so a script that
+# runs after a failed one would silently consume whatever an earlier run left
+# behind. Stop at the first failure by default; --keep-going restores the old
+# behaviour for debugging.
+keep_going <- "--keep-going" %in% args
+results <- setNames(rep(NA, length(scripts)), scripts)
+for (f in scripts) {
+  results[[f]] <- run_one(f)
+  if (!results[[f]] && !keep_going) {
+    cat("\nStopping: ", f, " failed and later scripts depend on its output.\n",
+        "Fix it and re-run; pass --keep-going to continue past failures.\n", sep = "")
+    break
+  }
+}
 
 cat("\n", strrep("=", 78), "\nPIPELINE SUMMARY\n", strrep("=", 78), "\n", sep = "")
 for (i in seq_along(scripts)) {
-  cat(sprintf("  %-45s %s\n", scripts[i], if (results[i]) "OK" else "FAILED"))
+  cat(sprintf("  %-45s %s\n", scripts[i],
+              if (is.na(results[i])) "not run" else if (results[i]) "OK" else "FAILED"))
 }
 
 wb_write_session_info()
 
-if (!all(results)) {
+if (!all(results, na.rm = TRUE) || anyNA(results)) {
   quit(status = 1)
 }

@@ -1,0 +1,27 @@
+Variable,N,Mean,SD,Min,Median,Max
+Population density,356,2978.01,1954.52,29.38,2854.27,13497.41
+Housing density,356,1246.30,1142.93,7.56,1105.58,10255.19
+"Distance to downtown Denver, km",358,10.66,6.25,0.62,9.12,51.58
+Percent below poverty,356,15.84,12.17,0.00,14.81,59.78
+Percent foreign-born,356,22.06,10.64,1.87,22.55,48.26
+Neighborhood SES index,355,0.02,0.90,-1.38,-0.23,7.94
+EPA National Walkability Index,358,13.93,2.67,4.33,14.33,19.17
+Street intersection density (per sq mile),278,165.11,54.64,26.60,165.52,500.61
+"Distance to nearest urban center, m",358,1264.57,1269.79,0.00,995.65,12487.84
+HUD Jobs Proximity Index,278,54.12,25.05,0.00,54.00,99.00
+Sidewalk density within 800 m,358,22366.17,7078.10,1464.94,22659.99,35113.42
+Bicycle facility density within 800 m,358,1716.75,1044.45,0.00,1524.83,7182.93
+Active transportation corridor density within 800 m,358,1277.61,669.42,0.00,1293.63,4078.51
+Transportation cost index,358,16.96,2.58,9.00,17.00,25.00
+Tree Equity Score,278,85.79,6.96,67.00,86.00,100.00
+Tree canopy share,278,0.15,0.07,0.01,0.16,0.39
+Park acres within 800 m,358,43.62,46.07,0.00,25.11,298.94
+"Distance to nearest park, m",358,228.53,183.49,2.06,198.80,937.97
+Tree canopy land cover within 800 m,358,0.12,0.06,0.00,0.12,0.32
+Impervious surface within 800 m,358,0.43,0.11,0.10,0.43,0.72
+Crash density within 800 m,358,76.76,56.34,2.49,65.15,388.93
+Pedestrian crash density within 800 m,358,2.85,3.65,0.00,1.99,27.85
+Bicycle crash density within 800 m,358,0.88,1.35,0.00,0.50,16.41
+Short-trip opportunity zone share within 800 m,358,0.35,0.32,0.00,0.26,1.00
+Residential diversity index,358,0.50,0.16,0.15,0.53,0.76
+Experienced diversity index,358,0.24,0.04,0.12,0.23,0.35

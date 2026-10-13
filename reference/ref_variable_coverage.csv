@@ -1,0 +1,62 @@
+Variable,Column,Group,Observed,Missing,Percent_missing
+Subjective well-being index,swb_index,Outcomes,368,13,3.41
+Neighborhood belonging index,belonging_index,Outcomes,370,11,2.89
+Satisfaction: standard of living,sat_stand_liv,Scale items,366,15,3.94
+Satisfaction: health,sat_health,Scale items,361,20,5.25
+Satisfaction: life achievement,sat_life_achieve,Scale items,362,19,4.99
+Feels safe,feel_safe,Scale items,349,32,8.40
+Feels accepted,feel_accepted,Scale items,356,25,6.56
+Confident about finances,feel_conf_finance,Scale items,354,27,7.09
+Feels a sense of belonging,hood_belong,Scale items,368,13,3.41
+Trusts people in the neighborhood,hood_trust_people,Scale items,365,16,4.20
+Could borrow from a neighbor,hood_borrow,Scale items,363,18,4.72
+Has contacts in the neighborhood,hood_contacts,Scale items,364,17,4.46
+Age,age,Individual characteristics,363,18,4.72
+Number of children,children,Individual characteristics,377,4,1.05
+Household income,income_hh,Individual characteristics,370,11,2.89
+Education,edu_level,Individual characteristics,377,4,1.05
+English-speaking proficiency,engl_speak,Individual characteristics,375,6,1.57
+Time in Denver metro,time_live_denver,Individual characteristics,374,7,1.84
+Time in current neighborhood,time_live_hood,Individual characteristics,374,7,1.84
+Female,ind_female,Individual characteristics,372,9,2.36
+Married,ind_married,Individual characteristics,371,10,2.62
+Previously married (sep./div./widowed),ind_prev_married,Individual characteristics,371,10,2.62
+Hispanic,ind_hispanic,Individual characteristics,372,9,2.36
+Race: White,ind_race_white,Individual characteristics,366,15,3.94
+Lawful permanent resident,ind_lpr,Individual characteristics,367,14,3.67
+No official status (undocumented),ind_undocumented,Individual characteristics,367,14,3.67
+"DACA, student/work visa, refugee, asylee",ind_imm_other,Individual characteristics,367,14,3.67
+Population below poverty,pct_poverty,Neighborhood demographics,356,25,6.56
+Foreign-born population,pct_non_native,Neighborhood demographics,356,25,6.56
+Neighborhood SES index,neighborhood_ses_index,Neighborhood demographics,355,26,6.82
+Non-Hispanic white population,pct_nh_white,Neighborhood demographics,356,25,6.56
+Residential diversity,div_total_diversity_resi,Neighborhood demographics,358,23,6.04
+Experienced diversity,div_exposure_mean,Neighborhood demographics,358,23,6.04
+Population density,pop_density,"Density, location and urban form",356,25,6.56
+Housing density,housing_density,"Density, location and urban form",356,25,6.56
+Share of multifamily housing,pct_multifamily,"Density, location and urban form",356,25,6.56
+Distance to downtown Denver,dist_downtown_km,"Density, location and urban form",358,23,6.04
+Distance to nearest urban center,urban_center_nearest_dist_m,"Density, location and urban form",358,23,6.04
+EPA National Walkability Index,walk_nat_walk_ind,"Density, location and urban form",358,23,6.04
+Street intersection density,street_intdensity,"Density, location and urban form",278,103,27.03
+"Short-trip opportunity zone share, 800 m",short_trip_zone_share_800,"Density, location and urban form",358,23,6.04
+HUD Jobs Proximity Index,hudjob_jobs_idx,Transportation and accessibility,278,103,27.03
+"Sidewalk density, 800 m",sidewalk_density_800,Transportation and accessibility,358,23,6.04
+"Bicycle facility density, 800 m",bike_facility_density_800,Transportation and accessibility,358,23,6.04
+"Active corridor density, 800 m",active_corridor_density_800,Transportation and accessibility,358,23,6.04
+Transportation cost at area median income,ht_t_ami,Transportation and accessibility,358,23,6.04
+Tree Equity Score,tree_tes,Green space,278,103,27.03
+Tree canopy share (Tree Equity),tree_treecanopy,Green space,278,103,27.03
+Park acreage within 800 m,park_acres_half_mile,Green space,358,23,6.04
+Distance to nearest park,park_nearest_dist_m,Green space,358,23,6.04
+"Tree canopy land cover, 800 m",lc_800m_tree_canopy,Green space,358,23,6.04
+"NDVI, 800 m",ndvi_800,Green space,358,23,6.04
+"Crash density, 800 m",crash_density_800,Safety and environmental quality,358,23,6.04
+"Pedestrian crash density, 800 m",ped_crash_density_800,Safety and environmental quality,358,23,6.04
+"Bicycle crash density, 800 m",bike_crash_density_800,Safety and environmental quality,358,23,6.04
+"Impervious surface land cover, 800 m",lc_800m_impervious_surfaces,Safety and environmental quality,358,23,6.04
+Fine particle pollution (PM2.5),env_pm25,Safety and environmental quality,278,103,27.03
+Proximity to Superfund (NPL) sites,env_npl_proximity,Safety and environmental quality,278,103,27.03
+Zoning category,zone_category,Land use and regulation,337,44,11.55
+Accessory dwelling units permitted,zone_adu_yes,Land use and regulation,290,91,23.88
+"Pedestrian focus area share, 800 m",pfa_share_800,Land use and regulation,358,23,6.04

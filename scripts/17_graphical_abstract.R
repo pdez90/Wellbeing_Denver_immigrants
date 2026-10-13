@@ -117,12 +117,12 @@ draw <- function() {
   lad <- list(
     list(y = 82, t = "Individual characteristics",
          s = sprintf("age, gender, marital status, income, education,\nEnglish, time in Denver     (n = %d)", n_base)),
-    list(y = 69, t = "+ Neighborhood socioeconomic context",
-         s = sprintf("density, distance to downtown, poverty,\nforeign-born share, SES index     (n = %d)", n_ctx)),
+    list(y = 69, t = "+ Neighborhood demographics",
+         s = sprintf("poverty, foreign-born share, SES index,\nnon-Hispanic white share, diversity     (n = %d)", n_ctx)),
     list(y = 56, t = "+ One built-environment domain at a time",
-         s = sprintf("urban form | transportation | greenness and parks\nsafety | land use and regulation     (n = %d to %d)", n_int, n_safety)),
+         s = "density and location | transportation | green space\nsafety and environment | land use     (n = 238 to 245)"),
     list(y = 43, t = "Integrated model",
-         s = sprintf("strongest predictors from every domain, fitted\nwith and without belonging     (n = %d)", n_int)),
+         s = sprintf("strongest predictor from each domain, fitted\nwith and without belonging     (n = %d)", n_int)),
     list(y = 30, t = "Mediation",
          s = sprintf("%d exposures tested through belonging,\n1,000 bootstrap resamples, Holm-corrected", n_med))
   )
@@ -140,16 +140,16 @@ draw <- function() {
   rbox(108, 58, 68, 60, fill = PANEL, border = NA)
 
   rbox(88, 79, 40, 14, fill = "#FFFFFF", border = SWBCOL)
-  text(88, 83.4, "Transportation-supportive form", cex = 0.78, font = 2, col = SWBCOL)
-  blab(88, 79.6, "walkability", walk)
-  blab(88, 76.6, "bicycle facilities", bike)
-  blab(88, 73.6, "park acreage", park)
+  text(88, 83.4, "Direct correlates of well-being", cex = 0.78, font = 2, col = SWBCOL)
+  blab(88, 79.6, "bicycle facilities", bike)
+  blab(88, 76.6, "park acreage", park)
+  blab(88, 73.6, "walkability", walk)
 
   rbox(88, 44, 40, 14, fill = "#FFFFFF", border = BELCOL)
-  text(88, 48.4, "Greenness and social context", cex = 0.78, font = 2, col = BELCOL)
-  blab(88, 44.6, "tree canopy", canop)
+  text(88, 48.4, "Correlates of belonging", cex = 0.78, font = 2, col = BELCOL)
+  blab(88, 44.6, "distance to urban centre", ucen)
   blab(88, 41.6, "neighborhood poverty", pov)
-  blab(88, 38.6, "distance to urban centre", ucen)
+  blab(88, 38.6, "park acreage", park)
 
   rbox(134, 68, 26, 9.5, fill = "#FFFFFF", border = SWBCOL, lwd = 1.5)
   text(134, 69.8, "Subjective", cex = 0.82, font = 2, col = SWBCOL)
@@ -168,13 +168,12 @@ draw <- function() {
 
   # the compound route the data do not support
   lines(c(108.5, 114, 119), c(47.5, 53, 58), col = "#9A9A9A", lwd = 1.2, lty = 3)
-  points(114, 53, pch = 4, cex = 1.7, lwd = 2.6, col = "#8A8A8A")
-  text(101, 57.5, sprintf("no indirect route\n%d of %d indirect effects\nsurvive correction", n_survive, n_med),
+  text(101, 57.5, sprintf("one indirect route:\ndistance to urban centre\n(%d of %d survive correction)", n_survive, n_med),
        cex = 0.68, col = MUTE, font = 3, adj = 0)
 
-  text(76, 29, "Belonging is a parallel dimension of neighborhood experience,",
+  text(76, 29, "Belonging carries the association for distance from urban centres;",
        adj = 0, cex = 0.8, col = INK, font = 2)
-  text(76, 25.6, "not the mechanism linking the built environment to well-being.",
+  text(76, 25.6, "for the rest of the built environment it is a parallel dimension.",
        adj = 0, cex = 0.8, col = INK, font = 2)
 
   # ================= column 3: robustness ====================================

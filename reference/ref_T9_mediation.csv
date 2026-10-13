@@ -1,0 +1,7 @@
+Domain,Predictor,N,Indirect effect (ACME),95% CI,ACME p,ACME p (Holm),Direct effect (ADE),ADE p,Total effect,Total p
+"Density, location and urban form",Distance to urban center,304,0.087,"(0.038, 0.143)",0.000,0.000,0.094,0.084,0.180,0.004
+Transportation and accessibility,Bicycle facility density,304,0.045,"(0.004, 0.097)",0.030,0.120,0.147,0.002,0.193,0.000
+Green space,Park acreage within 800 m,304,0.049,"(-0.002, 0.107)",0.060,0.180,0.110,0.030,0.159,0.002
+Safety and environmental quality,Bicycle crash density,304,-0.005,"(-0.083, 0.044)",0.756,1.000,0.151,0.002,0.146,0.000
+Land use and regulation,Pedestrian focus area share,304,-0.014,"(-0.068, 0.034)",0.620,1.000,0.032,0.550,0.018,0.724
+Land use and regulation,ADU permitted,245,-0.131,"(-0.270, -0.023)",0.016,0.080,0.014,0.886,-0.117,0.334
