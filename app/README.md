@@ -39,5 +39,5 @@ are not tracked in git; regenerate them from the data folder.
 - Integrated model and mediation, with the confounding sensitivity.
 - Sensitivity checks: buffer radius, greenness specification, common sample, spatial standard errors, robust regression, item overlap.
 - Descriptives: every variable group with its distribution panel.
-- Map: respondents per tract (suppressed < 5) and public area-level measures by tract or block group.
+- Map: respondents per tract (suppressed < 5). Nothing is drawn at a finer geography than the tract; area-level measures are in Figure S12.
 - Variables: definitions, units, geography, vintage and source.

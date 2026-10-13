@@ -5,13 +5,13 @@
 #   WELLBEING_DIR=~/Wellbeing/data Rscript app/prepare_app_data.R
 #
 # PRIVACY RULE. Nothing written to app/data/ or app/www/ is a respondent row.
-# The app reads model output, descriptive tables, and census-geography
-# aggregates only. Respondent counts by tract are suppressed below
-# MIN_CELL. The one file in the pipeline that holds respondent rows
+# The app reads model output, descriptive tables, and one census-geography
+# aggregate: respondent counts by tract, suppressed below MIN_CELL. The one
+# file in the pipeline that holds respondent rows
 # (model_data_domain_models.csv) is never copied, and the analysis file is
-# read here only to count respondents per tract and to average public
-# area-level measures within tracts and block groups -- values that are
-# identical for everyone in the unit and come from public sources.
+# read here only to count respondents per tract. No block-group layer is
+# built: a set of polygons drawn only where respondents live would disclose
+# residence at block-group resolution, finer than the suppression rule.
 #
 # Run from the repository root. Needs internet the first time for the
 # census geometry (tigris caches it).
@@ -71,13 +71,17 @@ for (f in list.files(src("descriptives", "figures"), pattern = "^Panel_.*\\.png$
   file.copy(f, file.path(app_dir, "www", basename(f)), overwrite = TRUE)
 
 # ---- 2. Census-geography aggregates ------------------------------------------
-message("Building tract and block-group aggregates")
+message("Counting respondents by tract")
 analysis_file <- if (file.exists(src("respondents_with_new_variables.csv")))
   src("respondents_with_new_variables.csv") else src("respondents_with_transport_ht_segpoi_stoz_diversity.csv")
 dat <- readr::read_csv(analysis_file, show_col_types = FALSE, guess_max = 5000) %>% janitor::clean_names()
-pad <- function(x, w) { x <- gsub("\\.0+$", "", as.character(x)); x[!is.na(x)] <- formatC(x[!is.na(x)], width = w, flag = "0"); x }
+pad <- function(x, w) {
+  x <- gsub("\\.0+$", "", as.character(x)); ok <- !is.na(x)
+  x[ok] <- paste0(strrep("0", pmax(0, w - nchar(x[ok]))), x[ok])   # formatC pads character with blanks, not zeros
+  if (any(nchar(x[ok]) != w)) stop("GEOID of unexpected width after padding")
+  x
+}
 dat$tract_geoid <- pad(dat$tract_geoid, 11)
-dat$bg_geoid    <- pad(dat$bg_geoid, 12)
 
 # respondent counts by tract, suppressed
 counts <- dat %>% filter(!is.na(tract_geoid)) %>% count(tract_geoid, name = "n") %>%
@@ -86,52 +90,22 @@ counts <- dat %>% filter(!is.na(tract_geoid)) %>% count(tract_geoid, name = "n")
   select(-n)
 message("  tracts with respondents: ", nrow(counts), "; shown exactly: ", sum(!is.na(counts$n_shown)))
 
-# public area-level measures, averaged within their own geography
-area_vars <- list(
-  list(col = "pop_density",            geo = "tract", lab = "Population density",            unit = "persons per sq km (ACS 2015-2019)"),
-  list(col = "pct_poverty",            geo = "tract", lab = "Population below poverty",      unit = "% (ACS 2015-2019)"),
-  list(col = "pct_non_native",         geo = "tract", lab = "Foreign-born population",       unit = "% (ACS 2015-2019)"),
-  list(col = "pct_nh_white",           geo = "tract", lab = "Non-Hispanic white population", unit = "% (ACS 2015-2019)"),
-  list(col = "walk_nat_walk_ind",      geo = "bg",    lab = "EPA National Walkability Index", unit = "index, 1-20"),
-  list(col = "tree_tes",               geo = "bg",    lab = "Tree Equity Score",             unit = "score, 0-100"),
-  list(col = "hudjob_jobs_idx",        geo = "bg",    lab = "HUD Jobs Proximity Index",      unit = "index, 0-100"),
-  list(col = "env_pm25",               geo = "bg",    lab = "Fine particle pollution (PM2.5)", unit = "micrograms per cubic metre (EnviroScreen)")
-)
-area_vars <- Filter(function(v) v$col %in% names(dat), area_vars)
-agg_by <- function(geo) {
-  key <- if (geo == "tract") "tract_geoid" else "bg_geoid"
-  vs  <- Filter(function(v) v$geo == geo, area_vars)
-  if (!length(vs)) return(NULL)
-  dat %>% filter(!is.na(.data[[key]])) %>%
-    group_by(GEOID = .data[[key]]) %>%
-    summarise(across(all_of(vapply(vs, `[[`, "", "col")), ~ mean(suppressWarnings(as.numeric(.x)), na.rm = TRUE)), .groups = "drop")
-}
-tr_vals <- agg_by("tract"); bg_vals <- agg_by("bg")
-
 # geometry
 message("Fetching census geometry (tigris, 2019 cartographic boundaries)")
 metro_names <- c("Denver", "Adams", "Arapahoe", "Jefferson", "Douglas", "Broomfield")
 co  <- tigris::counties(state = "CO", cb = TRUE, year = 2019, progress_bar = FALSE)
 metro <- co[co$NAME %in% metro_names, ] %>% st_transform(4326) %>% select(NAME)
 tr  <- tigris::tracts(state = "CO", cb = TRUE, year = 2019, progress_bar = FALSE) %>% st_transform(4326)
-bg  <- tigris::block_groups(state = "CO", cb = TRUE, year = 2019, progress_bar = FALSE) %>% st_transform(4326)
 metro_fips <- unique(co$COUNTYFP[co$NAME %in% metro_names])
-tr_metro <- tr[tr$COUNTYFP %in% metro_fips, c("GEOID")]
-bg_metro <- bg[bg$COUNTYFP %in% metro_fips, c("GEOID")]
-
-tr_metro <- tr_metro %>% left_join(counts, by = c("GEOID" = "tract_geoid"))
-if (!is.null(tr_vals)) tr_metro <- tr_metro %>% left_join(tr_vals, by = "GEOID")
-if (!is.null(bg_vals)) bg_metro <- bg_metro %>% left_join(bg_vals, by = "GEOID")
-bg_cols  <- vapply(Filter(function(v) v$geo == "bg", area_vars), `[[`, "", "col")
-if (length(bg_cols)) bg_metro <- bg_metro[rowSums(!is.na(st_drop_geometry(bg_metro)[, bg_cols, drop = FALSE])) > 0, ]
+tr_metro <- tr[tr$COUNTYFP %in% metro_fips, c("GEOID")] %>%
+  left_join(counts, by = c("GEOID" = "tract_geoid"))
+if (sum(!is.na(tr_metro$label)) != nrow(counts)) stop("some respondent tracts did not join the census geometry")
 
 # simplify for a light map
 tr_metro <- st_simplify(tr_metro, dTolerance = 30, preserveTopology = TRUE)
-bg_metro <- st_simplify(bg_metro, dTolerance = 30, preserveTopology = TRUE)
 metro    <- st_simplify(metro,    dTolerance = 50, preserveTopology = TRUE)
 
-saveRDS(list(metro = metro, tracts = tr_metro, block_groups = bg_metro,
-             area_vars = area_vars, min_cell = MIN_CELL,
+saveRDS(list(metro = metro, tracts = tr_metro, min_cell = MIN_CELL,
              built = format(Sys.time(), "%Y-%m-%d")), dst("geo.rds"))
 
 # ---- 3. A manifest, so the privacy claim is checkable -----------------------

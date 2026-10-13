@@ -142,8 +142,9 @@ mediation_table <- purrr::pmap_dfr(
 # -----------------------------------------------------------------------------
 # Multiplicity
 # -----------------------------------------------------------------------------
-# Ten indirect effects are tested. An uncorrected p < .05 among ten tests is
-# weak evidence on its own, so report both.
+# One indirect effect is tested per selected exposure (six in the current
+# selection). An uncorrected p < .05 among several tests is weak evidence on
+# its own, so report both.
 
 mediation_table_clean <- mediation_table %>%
   dplyr::mutate(
@@ -208,7 +209,8 @@ ft8 <- flextable::flextable(table8) %>%
     "in the Denver metro area, years in the current neighborhood, demographic indicators, and",
     "neighborhood demographics); each model contains a single exposure. Exposures were selected",
     "by their domain-model significance, so the analysis is exploratory; Holm-adjusted p-values",
-    sprintf("account for the %d indirect effects tested, not for that selection.", nrow(table8))
+    sprintf("account for the %d indirect effects tested, not for that selection.",
+            sum(!is.na(mediation_table_clean$acme_p)))
   ))
 
 doc8 <- officer::read_docx() %>%

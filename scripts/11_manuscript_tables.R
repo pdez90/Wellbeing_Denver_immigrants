@@ -286,8 +286,8 @@ NOTES <- c(
   paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood socioeconomic context."),
   paste(NOTE_STARS, "Zoning category is tested jointly; see zoning_joint_tests.csv. Reference zoning category is residential low density."),
   NOTE_STARS, NOTE_STARS,
-  "ACME = average causal mediation effect; ADE = average direct effect. Indirect effects estimated using 1,000 nonparametric bootstrap simulations with a fixed seed. Mediation models use the same covariate set and analytic samples as the domain models. Holm-adjusted p-values account for ten tested indirect effects.",
-  "Sensitivity of the greenness domain to the collinearity between the Tree Equity Score and the canopy share from which it is derived (r = .89). Specification D recovers 66 respondents because Tree Equity coverage restricts the greenness analytic sample.")
+  paste0("ACME = average causal mediation effect; ADE = average direct effect. Indirect effects estimated using 1,000 nonparametric bootstrap simulations with a fixed seed. Mediation models use the covariate set of the integrated model, with a single exposure per model and that exposure's domain analytic sample. Exposures were selected by their domain-model significance, so the analysis is exploratory; Holm-adjusted p-values account for the ", sum(!is.na(med$acme_p)), " indirect effects tested, not for that selection."),
+  "Sensitivity of the green space domain to the collinearity between the Tree Equity Score and the canopy share from which it is derived (r = .89). Specification A is the green space domain as fitted (park acreage, distance to nearest park, land-cover canopy and NDVI alongside the two Tree Equity measures); B-D remove one or both Tree Equity terms and keep everything else. Specification D recovers 66 respondents because Tree Equity coverage restricts the green space analytic sample.")
 
 for (i in seq_along(TABLES))
   readr::write_csv(TABLES[[i]], file.path(out_tab, sprintf("Table%02d.csv", i)))

@@ -9,22 +9,24 @@
 # ---------------
 # The greenness domain model enters tree_tes (Tree Equity Score) and
 # tree_treecanopy (the canopy share the Score is computed from) together. They
-# correlate at r = .89, with VIFs of 13.7 and 10.4, and they take opposite
-# signs. That is the signature of two collinear predictors splitting a shared
+# correlate at r = .89, carry VIFs above 10, and take opposite signs. That is the signature of two collinear predictors splitting a shared
 # association, not of two distinct effects.
 #
-# The paper's largest built-environment coefficient -- Tree Equity Score
-# predicting neighborhood belonging, beta = 0.468, p < .05 -- comes from that
-# model. This script refits the greenness domain four ways to establish whether
-# the finding is real or an artifact.
+# This script refits the green space domain four ways to establish whether
+# any Tree Equity finding is an artifact of that collinearity. The baseline is
+# the domain exactly as 08 fitted it (read from the saved model objects, so the
+# two scripts cannot disagree); the other specifications remove only the Tree
+# Equity terms and keep park acreage, park distance, land-cover canopy and NDVI.
 #
-#   A. Both Tree Equity measures        (the current specification)
+#   A. Both Tree Equity measures        (the domain model)
 #   B. Tree Equity Score only
 #   C. Tree Equity canopy share only
-#   D. Neither -- keep only the independently measured DRCOG land-cover canopy
+#   D. Neither Tree Equity measure
 #
 # Specification D also recovers 66 respondents (n = 304 vs 238), because Tree
-# Equity coverage is what restricts the greenness sample.
+# Equity coverage is what restricts the green space sample. In the restructured
+# (September 2026) domain no Tree Equity term is significant in any
+# specification; the table is kept because the collinearity is still there.
 # =============================================================================
 
 if (!exists(".wb_config_loaded")) source("00_config.R")

@@ -180,7 +180,11 @@ domain results, and the paper describes them as such.
 published values in `reference/` (tracked in git despite the `*.csv` rule). It
 distinguishes exact reproduction at the published precision from agreement
 within tolerance, counts an absent output file as a missing check rather than
-skipping it, and exits with status 1 on any drift or missing check.
+skipping it, and exits with status 1 on any drift or missing check. The
+greenness sensitivity table (SI Table S16) is not in the reference set: its
+baseline is the green space domain as fitted, which the September 2026
+restructuring changed (NDVI in, impervious surface out), so the pre-restructure
+published table is no longer the right comparison.
 
 **Model specifications are strict.** `make_lm()` stops if a requested predictor
 is missing or constant, rather than fitting a reduced model, so an upstream join

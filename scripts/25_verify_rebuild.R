@@ -89,7 +89,7 @@ add <- function(check, item, published, rebuilt, tol, kind, scale = NA_real_) {
     within <- if (kind == "rel")      abs(rebuilt - pub) <= tol * max(abs(pub), 1e-9)
               else if (kind == "sd")  abs(rebuilt - pub) <= tol * scale
               else                    abs(rebuilt - pub) <= tol
-    if (exact) "match" else if (within) "within tolerance" else "DRIFT"
+    if (exact) "match" else if (isTRUE(within)) "within tolerance" else "DRIFT"
   }
   report[[length(report) + 1]] <<- data.frame(
     check = check, item = item, published = pub, rebuilt = rebuilt,
@@ -291,7 +291,10 @@ if (!nrow(drift) && !nrow(missing) && !nrow(within)) {
 
 # A verification that found drift or could not run a check is a failure, so
 # that a pipeline calling this script cannot report success by accident.
-if (nrow(drift) || nrow(missing)) quit(status = 1)
+if (nrow(drift) || nrow(missing)) {
+  if (interactive()) stop("verification failed: ", nrow(drift), " drift, ", nrow(missing), " missing", call. = FALSE)
+  quit(save = "no", status = 1)
+}
 
 cat("\nWrote rebuild_verification.csv\n")
 cat("\nA reminder on how to read this. Matching descriptives with a moved\n")
