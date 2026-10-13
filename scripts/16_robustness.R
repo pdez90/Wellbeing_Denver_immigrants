@@ -288,7 +288,9 @@ cat(sprintf("Correlation between the two well-being indices: r = %.3f\n",
 rows4 <- list()
 for (nm in names(MODELS)) {
   sp <- MODELS[[nm]]
-  if (sp$oc != "swb_z") next
+  # belonging is added to every SWB model below, so a model that already has it
+  # would only repeat its belonging-free counterpart
+  if (sp$oc != "swb_z" || "belonging_z" %in% sp$rhs) next
   rhs <- unique(c("belonging_z", sp$rhs))
   used <- stats::complete.cases(dat[, c("swb_z", "swb_z_drop", "belonging_z", rhs), drop = FALSE])
   sub  <- dat[used, , drop = FALSE]

@@ -103,13 +103,13 @@ draw_figure <- function() {
   plot.window(xlim = c(0, 140), ylim = c(0, 62), asp = 1)
 
   nodebox(26, 30, 48, 14, "Built environment measure  (X)",
-          "800 m buffer exposure, standardized")
+          "one measure per model, standardized if continuous")
   nodebox(70, 52, 40, 12, "Neighborhood belonging  (M)",
           bquote("4-item scale, " * alpha * " = 0.79"))
   nodebox(114, 30, 44, 14, "Subjective well-being  (Y)",
-          bquote("5-item scale, " * alpha * " = 0.91"))
+          bquote("6-item scale, " * alpha * " = 0.91"))
   nodebox(70, 8, 82, 12, "Covariates  (C)",
-          paste("Individual characteristics + neighborhood socioeconomic context",
+          paste("Individual characteristics + neighborhood demographic controls",
                 "(same set in the mediator and the outcome equation)", sep = "\n"),
           dashed = TRUE)
 

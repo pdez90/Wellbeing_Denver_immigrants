@@ -1,4 +1,4 @@
-Outcome,Specification,Predictor,Estimate,N,Adj. R²,Max greenness VIF
+Outcome,Specification,Predictor,Estimate,N,Adj. R²,Max VIF (green space)
 Neighborhood belonging,A. Both Tree Equity measures,Tree Equity Score,0.307 (0.228),238,0.148,15.1
 Neighborhood belonging,A. Both Tree Equity measures,Tree canopy (Tree Equity),-0.336 (0.187)+,238,0.148,15.1
 Neighborhood belonging,A. Both Tree Equity measures,Park acreage within 800 m,0.162 (0.076)*,238,0.148,15.1

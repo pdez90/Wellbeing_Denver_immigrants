@@ -72,7 +72,7 @@ SECTIONS <- list(
 
   "NEIGHBORHOOD BUILT ENVIRONMENT (NBE) VARIABLES" = list(
 
-    "CATEGORY 1: Density, location and urban form" = rbind(
+    "DOMAIN 1: Density, location and urban form" = rbind(
       V("dist_downtown_km", "Distance to downtown Denver",
         "Straight-line distance from the geocoded residence to downtown Denver",
         "km", "residence", "2019", "Computed from geocoded coordinates"),
@@ -99,7 +99,7 @@ SECTIONS <- list(
         "% of units", "block group", "2015-2019", ACS)
     ),
 
-    "CATEGORY 2: Transportation and accessibility" = rbind(
+    "DOMAIN 2: Transportation and accessibility" = rbind(
       V("hudjob_jobs_idx", "Jobs proximity",
         "HUD Jobs Proximity Index, higher values indicating better access to employment",
         "index, 0-100", "block group", "2020", "HUD Jobs Proximity Index"),
@@ -118,8 +118,8 @@ SECTIONS <- list(
         "Center for Neighborhood Technology Housing + Transportation Affordability Index")
     ),
 
-    "CATEGORY 3: Green space" = rbind(
-      V("tree_tes", "Tree equity score",
+    "DOMAIN 3: Green space" = rbind(
+      V("tree_tes", "Tree Equity Score",
         "American Forests Tree Equity Score, combining canopy cover with demographic and heat indicators",
         "score, 0-100", "block group", "2023", "American Forests Tree Equity Score"),
       V("tree_treecanopy", "Tree canopy share",
@@ -140,7 +140,7 @@ SECTIONS <- list(
         "MODIS MOD13Q1 (250 m, 16-day) via the ORNL DAAC")
     ),
 
-    "CATEGORY 4: Safety and environmental quality" = rbind(
+    "DOMAIN 4: Safety and environmental quality" = rbind(
       V("crash_density_800", "Crash density",
         "All reported crashes within the 800 m buffer divided by buffer area",
         "crashes/sq km", "800 m buffer", "2019", paste(DRCOG, "regional crash records")),
@@ -161,7 +161,7 @@ SECTIONS <- list(
         "index", "block group", "2022", "Colorado EnviroScreen v2")
     )),
 
-  "LAND USE AND REGULATION VARIABLES" = list(
+  "DOMAIN 5: Land use and regulation" = list(
     "_" = rbind(
       V("zone_category", "Zoning category",
         "Generalized zoning at the parcel: residential low density (reference), residential medium-to-high density, mixed use, nonresidential",

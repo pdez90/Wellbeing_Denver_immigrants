@@ -142,7 +142,8 @@ draw <- function() {
   # below the axis title. legend() placed inside the panel would sit on top of
   # the lowest intervals, and its automatic placement is unreliable on a
   # reversed y axis.
-  ly <- n + 3.0
+  # 0.88 in below the bottom of the plotting region, whatever the axis direction
+  ly <- graphics::grconvertY(graphics::grconvertY(par("usr")[3], "user", "inches") - 0.88, "inches", "user")
   xs <- xr[1] + c(0, 0.32, 0.63) * diff(xr)
   for (k in seq_along(COL)) {
     nm <- names(COL)[k]

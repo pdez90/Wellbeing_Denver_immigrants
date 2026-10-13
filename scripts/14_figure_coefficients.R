@@ -202,7 +202,7 @@ draw_figure <- function() {
   graphics::layout(matrix(1:3, ncol = 1), heights = c(hA + 6, hB + 6, 2.4))
 
   graphics::par(family = "serif", mar = c(3.4, 14.6, 3.0, 1.2), mgp = c(2.0, 0.55, 0))
-  draw_panel(D[D$panel == "A", ], "A. Individual characteristics and neighborhood context", xr)
+  draw_panel(D[D$panel == "A", ], "A. Individual characteristics and neighborhood demographic controls", xr)
   draw_panel(D[D$panel == "B", ], "B. Built environment measures, by domain", xr)
 
   graphics::par(mar = c(0, 0, 0, 0))

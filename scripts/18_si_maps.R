@@ -204,18 +204,21 @@ draw_s11(); grDevices::dev.off()
 # Only measures defined on a census geography can be mapped as a surface. The
 # buffer-derived exposures are specific to each respondent's home and have no
 # areal footprint; they are described in Tables S2 to S12 instead.
-AREA_VARS <- list(
-  list(col = "pop_density",       geo = "tract", lab = "Population density",        unit = "persons per sq km"),
-  list(col = "pct_poverty",       geo = "tract", lab = "Population below poverty",  unit = "%"),
-  list(col = "pct_non_native",    geo = "tract", lab = "Foreign-born population",   unit = "%"),
-  list(col = "walk_nat_walk_ind", geo = "bg",    lab = "EPA National Walkability Index", unit = "index"),
-  list(col = "tree_tes",          geo = "bg",    lab = "Tree Equity Score",         unit = "score"),
-  list(col = "hudjob_jobs_idx",   geo = "bg",    lab = "HUD Jobs Proximity Index",  unit = "index")
-)
-AREA_VARS <- Filter(function(v) v$col %in% names(dat), AREA_VARS)
-if (!length(AREA_VARS)) stop("18_si_maps.R: none of the mapped measures are in the analysis file.")
-
-bg_study <- bg[bg$GEOID %in% unique(dat$bg_geoid), ]
+#
+# DISCLOSURE. The surfaces are drawn for EVERY tract or block group in the six
+# counties, from the public layers app/prepare_app_data.R builds from the
+# original sources. Averaging respondent rows by block group, as an earlier
+# version did, draws only the block groups where respondents live and so
+# discloses residence at block-group resolution.
+geo_pub <- file.path("..", "app", "data", "geo.rds")
+if (!file.exists(geo_pub))
+  stop("18_si_maps.R: Figure S12 maps the public layers in app/data/geo.rds; run app/prepare_app_data.R first.")
+G <- readRDS(geo_pub)
+S12_COLS <- c("acs_pop_density", "acs_pct_poverty", "acs_pct_foreign_born",
+              "walk_index", "tree_tes", "jobs_idx")
+AREA_VARS <- Filter(function(v) v$col %in% S12_COLS, G$area_vars)
+AREA_VARS <- AREA_VARS[order(match(vapply(AREA_VARS, `[[`, "", "col"), S12_COLS))]
+if (!length(AREA_VARS)) stop("18_si_maps.R: none of the Figure S12 layers are in app/data/geo.rds.")
 
 quantile_fill <- function(v, n = 5) {
   qs <- unique(stats::quantile(v, probs = seq(0, 1, length.out = n + 1), na.rm = TRUE))
@@ -229,15 +232,11 @@ quantile_fill <- function(v, n = 5) {
 draw_s12 <- function() {
   par(mfrow = c(2, 3), mar = c(0.3, 0.3, 2.6, 0.3), family = "serif")
   for (v in AREA_VARS) {
-    g   <- if (v$geo == "tract") tr_study else bg_study
-    key <- if (v$geo == "tract") "tract_geoid" else "bg_geoid"
-    val <- tapply(suppressWarnings(as.numeric(dat[[v$col]])), dat[[key]], mean, na.rm = TRUE)
-    g$val <- as.numeric(val[match(g$GEOID, names(val))])
-    q <- quantile_fill(g$val)
-    frame(metro, v$lab, sprintf("%s, by census %s", v$unit,
-                                ifelse(v$geo == "tract", "tract", "block group")))
+    g <- sf::st_transform(G$layers[[v$layer]], CRS)
+    q <- quantile_fill(g[[v$col]])
+    frame(metro, v$lab, v$unit)
     plot(sf::st_geometry(metro), col = "#FBFAF8", border = "#C9C4BC", lwd = 0.4, add = TRUE)
-    plot(sf::st_geometry(g), col = q$fill, border = "#FFFFFF", lwd = 0.2, add = TRUE)
+    plot(sf::st_geometry(g), col = q$fill, border = "#FFFFFF", lwd = 0.1, add = TRUE)
     plot(sf::st_geometry(metro), col = NA, border = "#7C7C7C", lwd = 0.6, add = TRUE)
     legend_box(metro, q$labs, q$pal, NULL, cex = 0.55)
   }

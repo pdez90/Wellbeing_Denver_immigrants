@@ -46,11 +46,14 @@ n_int    <- nof("SWB: final BE model")
 n_land   <- nof("SWB: land_use")
 n_safety <- nof("SWB: safety_env")
 
-walk  <- grab("SWB: density_location",            "walk_nat_walk_ind_z")
+ucsw  <- grab("SWB: density_location",      "urban_center_nearest_dist_m_z")
+npl   <- grab("SWB: safety_env",            "env_npl_proximity_z")
+biknb <- grab("Belonging: access_transport", "bike_facility_density_800_z")
+pknb  <- grab("Belonging: green_space",     "park_acres_half_mile_z")
 bike  <- grab("SWB: access_transport",      "bike_facility_density_800_z")
 park  <- grab("SWB: green_space",           "park_acres_half_mile_z")
 canop <- grab("Belonging: green_space",     "lc_800m_tree_canopy_z")
-pov   <- grab("Belonging: final BE model",  "pct_poverty_z")
+pov   <- grab("Belonging: density_location", "pct_poverty_z")
 ucen  <- grab("Belonging: density_location",      "urban_center_nearest_dist_m_z")
 belg  <- grab("SWB: final BE + belonging",  "belonging_z")
 
@@ -104,7 +107,7 @@ draw <- function() {
   # ---------------- header ---------------------------------------------------
   text(3, 103, "Neighborhood built environment, belonging and well-being among first-generation immigrants",
        adj = 0, cex = 1.3, font = 2, col = INK)
-  text(3, 98.2, sprintf("381 survey respondents in metropolitan Denver  |  358 geocoded homes  |  five built-environment domains in 800 m buffers  |  %d least-squares models",
+  text(3, 98.2, sprintf("381 survey respondents in metropolitan Denver  |  358 geocoded homes  |  five built-environment domains  |  %d least-squares models",
                         nrow(fit)),
        adj = 0, cex = 0.86, col = MUTE)
   segments(3, 95.5, 197, 95.5, col = LINE, lwd = 1.1)
@@ -139,17 +142,19 @@ draw <- function() {
   # ================= column 2: the findings ==================================
   rbox(108, 58, 68, 60, fill = PANEL, border = NA)
 
-  rbox(88, 79, 40, 14, fill = "#FFFFFF", border = SWBCOL)
-  text(88, 83.4, "Direct correlates of well-being", cex = 0.78, font = 2, col = SWBCOL)
+  rbox(88, 77.5, 40, 17, fill = "#FFFFFF", border = SWBCOL)
+  text(88, 83.4, "Correlates of well-being", cex = 0.78, font = 2, col = SWBCOL)
   blab(88, 79.6, "bicycle facilities", bike)
   blab(88, 76.6, "park acreage", park)
-  blab(88, 73.6, "walkability", walk)
+  blab(88, 73.6, "distance to urban center", ucsw)
+  blab(88, 70.6, "Superfund proximity", npl)
 
-  rbox(88, 44, 40, 14, fill = "#FFFFFF", border = BELCOL)
+  rbox(88, 42.5, 40, 17, fill = "#FFFFFF", border = BELCOL)
   text(88, 48.4, "Correlates of belonging", cex = 0.78, font = 2, col = BELCOL)
-  blab(88, 44.6, "distance to urban centre", ucen)
+  blab(88, 44.6, "distance to urban center", ucen)
   blab(88, 41.6, "neighborhood poverty", pov)
-  blab(88, 38.6, "park acreage", park)
+  blab(88, 38.6, "park acreage", pknb)
+  blab(88, 35.6, "bicycle facilities", biknb)
 
   rbox(134, 68, 26, 9.5, fill = "#FFFFFF", border = SWBCOL, lwd = 1.5)
   text(134, 69.8, "Subjective", cex = 0.82, font = 2, col = SWBCOL)
@@ -168,10 +173,10 @@ draw <- function() {
 
   # the compound route the data do not support
   lines(c(108.5, 114, 119), c(47.5, 53, 58), col = "#9A9A9A", lwd = 1.2, lty = 3)
-  text(101, 57.5, sprintf("one indirect route:\ndistance to urban centre\n(%d of %d survive correction)", n_survive, n_med),
+  text(101, 57.5, sprintf("one indirect route:\ndistance to urban center\n(%d of %d survive correction)", n_survive, n_med),
        cex = 0.68, col = MUTE, font = 3, adj = 0)
 
-  text(76, 29, "Belonging carries the association for distance from urban centres;",
+  text(76, 29, "Belonging carries part of the association for distance from urban centers;",
        adj = 0, cex = 0.8, col = INK, font = 2)
   text(76, 25.6, "for the rest of the built environment it is a parallel dimension.",
        adj = 0, cex = 0.8, col = INK, font = 2)
@@ -181,9 +186,9 @@ draw <- function() {
     c("Buffer radius", "400 m, 800 m and 1,600 m; the bicycle", "result strengthens with scale"),
     c("Common sample", "every domain refit on the 189 respondents", "complete on all five"),
     c("Spatial dependence", "cluster-robust and Conley standard errors;", sprintf("median change %.2f times", se_ratio)),
-    c("Influential respondents", "robust MM-estimator leaves the estimates", "essentially unchanged"),
+    c("Influential respondents", "robust MM-estimator: most estimates hold;", "urban center and parks weaken for well-being"),
     c("Item overlap", "well-being rescored without the", "\"feels accepted\" item"),
-    c("Collinear greenness", "Tree Equity measures entered", "separately and together")
+    c("Collinear Tree Equity measures", "entered separately", "and together")
   )
   ys <- seq(84, 28, length.out = length(checks))
   for (i in seq_along(checks)) {
@@ -196,7 +201,7 @@ draw <- function() {
   # ---------------- footer ---------------------------------------------------
   segments(3, 17.5, 197, 17.5, col = LINE, lwd = 1.1)
   text(3, 13.2,
-       "Standardized coefficients from ordinary least squares. Each exposure is shown as estimated in its own domain model; belonging comes from the integrated model. Every model adjusts for individual characteristics and neighborhood socioeconomic context.",
+       "Standardized coefficients from ordinary least squares. Each exposure is shown as estimated in its own domain model; belonging comes from the integrated model. Every model adjusts for individual characteristics and neighborhood demographic controls.",
        adj = 0, cex = 0.72, col = MUTE)
   text(3, 9.4,
        "+ p < 0.10   * p < 0.05   ** p < 0.01   *** p < 0.001.     Cross-sectional design: these are associations, not causal effects.",

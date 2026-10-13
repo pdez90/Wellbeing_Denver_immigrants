@@ -17,29 +17,30 @@
 # the Supplementary Information, so the mapping is:
 #
 #   Table 1  -> main text Table 1        Table 6  -> SI Table S18
-#   Table 2  -> SI Table S1              Table 7  -> SI Table S19
-#   Table 3  -> SI Table S14             Table 8  -> main text Table 2
-#   Table 4  -> SI Table S15             Table 9  -> main text Table 3
+#   Table 2  -> not in the manuscript    Table 7  -> SI Table S19
+#               (SI Tables S2-S12, from 13_descriptives_all.R, replace it)
+#   Table 3  -> SI Table S14             Table 8  -> SI Table S20 (main Figure 4)
+#   Table 4  -> SI Table S15             Table 9  -> main text Table 2
 #   Table 5  -> SI Table S17             Table 10 -> SI Table S16
 #
 # The SI has two sections: Section S1 is descriptive statistics for every
 # analysis variable (Tables S1-S13, Figures S1-S9, from 13_descriptives_all.R)
-# and Section S2 is the full model output (Tables S14-S19). Main text also
-# carries Figure 1 (12_figure_mediation_dag.R) and Figure 2
-# (14_figure_coefficients.R). This mapping is written to
+# and Section S2 is the full model output (Tables S14-S20). Main text also
+# carries Figure 2 (12_figure_mediation_dag.R), Figure 3
+# (14_figure_coefficients.R) and Figure 4 (19_figure_integrated_model.R). This mapping is written to
 # manuscript_tables/table_numbering.csv as well, so it is machine-readable.
 #
 # Table numbering:
 #   1  Sample characteristics and outcome variables
 #   2  Neighborhood and built environment characteristics
-#   3  Individual characteristics and neighborhood socioeconomic context
+#   3  Individual characteristics and neighborhood demographic controls
 #   4  Built environment domains predicting subjective well-being
 #   5  Built environment domains predicting neighborhood belonging
 #   6  Land use and regulation domain models
 #   7  Domains predicting SWB, adjusting for belonging
-#   8  Final parsimonious models
+#   8  Integrated model
 #   9  Formal causal mediation analyses
-#  10  Greenness measures: specification sensitivity
+#  10  Green space domain: Tree Equity specification sensitivity
 # =============================================================================
 
 if (!exists(".wb_config_loaded")) source("00_config.R")
@@ -184,12 +185,12 @@ IC <- individual_controls
 # The four non-regulatory domains, in the order wb_domains.R lists them; the
 # land use domain gets its own table below.
 dnames <- setdiff(names(domain_z), "land_use")
-dhdr   <- unname(WB_DOMAIN_LABELS_SHORT[dnames])
+dhdr   <- unname(WB_DOMAIN_LABELS[dnames])
 
 T3 <- coef_table(list(
   make_lm("swb_z", IC, model_dat), make_lm("swb_z", c(IC, context_z), model_dat),
   make_lm("belonging_z", IC, model_dat), make_lm("belonging_z", c(IC, context_z), model_dat)),
-  c("SWB: individual", "SWB: + context", "Belonging: individual", "Belonging: + context"))
+  c("SWB: individual", "SWB: + neighborhood demographics", "Belonging: individual", "Belonging: + neighborhood demographics"))
 
 T4 <- coef_table(lapply(dnames, function(d) make_lm("swb_z", unique(c(IC, context_z, domain_z[[d]])), model_dat)), dhdr)
 T5 <- coef_table(lapply(dnames, function(d) make_lm("belonging_z", unique(c(IC, context_z, domain_z[[d]])), model_dat)), dhdr)
@@ -259,7 +260,7 @@ for (oc in c("belonging_z", "swb_z")) for (nm in names(specs)) {
       sprintf("%.1f", max_green_vif(m, specs[[nm]])))
 }
 T10 <- as.data.frame(do.call(rbind, rows10), stringsAsFactors = FALSE)
-names(T10) <- c("Outcome", "Specification", "Predictor", "Estimate", "N", "Adj. R²", "Max greenness VIF")
+names(T10) <- c("Outcome", "Specification", "Predictor", "Estimate", "N", "Adj. R²", "Max VIF (green space)")
 
 # -----------------------------------------------------------------------------
 # Write
@@ -268,22 +269,22 @@ TABLES <- list(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
 TITLES <- c(
   "Sample Characteristics and Outcome Variables",
   "Neighborhood and Built Environment Characteristics",
-  "Individual Characteristics and Neighborhood Socioeconomic Context",
+  "Individual Characteristics and Neighborhood Demographic Controls",
   "Built Environment Domains Predicting Subjective Well-Being",
   "Built Environment Domains Predicting Neighborhood Belonging",
   "Land Use and Regulation Domain Models",
   "Built Environment Domains Predicting Subjective Well-Being, Adjusting for Neighborhood Belonging",
-  "Final Parsimonious Models",
+  "Integrated Model",
   "Formal Causal Mediation Analyses of Neighborhood Belonging",
-  "Greenness Measures: Specification Sensitivity")
+  "Green Space Domain: Tree Equity Specification Sensitivity")
 NOTE_STARS <- paste("Standardized coefficients with standard errors in parentheses.",
   "+ p < 0.10, * p < 0.05, ** p < 0.01, *** p < 0.001.",
   "Reference categories: never married, naturalized U.S. citizen.")
 NOTES <- c(
   "Panel A reports the mean, standard deviation, minimum and maximum of each continuous or ordinal measure. Panel B reports the percentage of respondents in each category; a standard deviation, minimum and maximum are not defined for a categorical measure, and an em dash marks those cells. N is the number of respondents with a valid response to that item.",
   "Respondent-level exposures derived from geocoded residential locations. Buffer measures use the 800 m radius unless noted. Street intersection density is per square mile (ICPSR 38580).",
-  NOTE_STARS, paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood socioeconomic context."),
-  paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood socioeconomic context."),
+  NOTE_STARS, paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood demographic controls."),
+  paste(NOTE_STARS, "All models additionally adjust for individual characteristics and neighborhood demographic controls."),
   paste(NOTE_STARS, "Zoning category is tested jointly; see zoning_joint_tests.csv. Reference zoning category is residential low density."),
   NOTE_STARS, NOTE_STARS,
   paste0("ACME = average causal mediation effect; ADE = average direct effect. Indirect effects estimated using 1,000 nonparametric bootstrap simulations with a fixed seed. Mediation models use the covariate set of the integrated model, with a single exposure per model and that exposure's domain analytic sample. Exposures were selected by their domain-model significance, so the analysis is exploratory; Holm-adjusted p-values account for the ", sum(!is.na(med$acme_p)), " indirect effects tested, not for that selection."),
@@ -315,9 +316,9 @@ print(doc, target = file.path(out_tab, "Manuscript_Tables.docx"))
 readr::write_csv(
   data.frame(
     table_here = 1:10,
-    manuscript = c("Main text Table 1", "SI Table S1", "SI Table S14", "SI Table S15",
-                   "SI Table S17", "SI Table S18", "SI Table S19", "Main text Table 2",
-                   "Main text Table 3", "SI Table S16"),
+    manuscript = c("Main text Table 1", "Not in manuscript (see SI Tables S2-S12)", "SI Table S14",
+                   "SI Table S15", "SI Table S17", "SI Table S18", "SI Table S19",
+                   "SI Table S20 (main text Figure 4)", "Main text Table 2", "SI Table S16"),
     title = TITLES
   ),
   file.path(out_tab, "table_numbering.csv")

@@ -10,7 +10,7 @@ Non-Hispanic white population,Non-Hispanic white residents as a share of the tot
 Residential diversity,Probability that two residents drawn at random differ in race or ethnicity,"index, 0-1",tract,2020 Census,"Xu et al. (2024), doi:10.1038/s41597-024-03490-y",358
 Experienced diversity,"The same probability computed over people present in the tract, from mobile-device records, averaged across five time-of-day intervals and weekday/weekend","index, 0-1",tract,2022,"Xu et al. (2024), doi:10.1038/s41597-024-03490-y",358
 NEIGHBORHOOD BUILT ENVIRONMENT (NBE) VARIABLES,,,,,,
-"CATEGORY 1: Density, location and urban form",,,,,,
+"DOMAIN 1: Density, location and urban form",,,,,,
 Distance to downtown Denver,Straight-line distance from the geocoded residence to downtown Denver,km,residence,2019,Computed from geocoded coordinates,358
 Short-trip opportunity zone share,Share of the 800 m buffer inside a designated short-trip opportunity zone,share of buffer,800 m buffer,2019,Denver Regional Council of Governments short-trip opportunity zones,358
 Walkability,"EPA National Walkability Index, combining intersection density, land-use mix, transit proximity and employment mix","index, 1-20",block group,2021,U.S. EPA National Walkability Index,358
@@ -19,27 +19,27 @@ Distance to nearest urban center,Straight-line distance to the nearest regionall
 Population density,Residents divided by block-group land area,persons/sq km,block group,2015-2019,American Community Survey 5-year estimates,356
 Housing density,Housing units divided by block-group land area,units/sq km,block group,2015-2019,American Community Survey 5-year estimates,356
 Share of multifamily housing,Housing units in structures of two or more units as a share of all units (B25024),% of units,block group,2015-2019,American Community Survey 5-year estimates,356
-CATEGORY 2: Transportation and accessibility,,,,,,
+DOMAIN 2: Transportation and accessibility,,,,,,
 Jobs proximity,"HUD Jobs Proximity Index, higher values indicating better access to employment","index, 0-100",block group,2020,HUD Jobs Proximity Index,278
 Sidewalk density,Sidewalk centerline length within the 800 m buffer divided by buffer area,m/sq km,800 m buffer,2022,Denver Regional Council of Governments planimetric sidewalk centerlines,358
 Bicycle facility density,Bicycle facility length within the 800 m buffer divided by buffer area,m/sq km,800 m buffer,2023,Denver Regional Council of Governments bicycle facility inventory,358
 Active corridor density,Active transportation corridor length within the 800 m buffer divided by buffer area,m/sq km,800 m buffer,2023,Denver Regional Council of Governments active transportation corridors,358
 Transportation cost at AMI,Modelled transportation costs as a share of income for a household at the area median income,% of income,block group,2019,Center for Neighborhood Technology Housing + Transportation Affordability Index,358
-CATEGORY 3: Green space,,,,,,
-Tree equity score,"American Forests Tree Equity Score, combining canopy cover with demographic and heat indicators","score, 0-100",block group,2023,American Forests Tree Equity Score,278
+DOMAIN 3: Green space,,,,,,
+Tree Equity Score,"American Forests Tree Equity Score, combining canopy cover with demographic and heat indicators","score, 0-100",block group,2023,American Forests Tree Equity Score,278
 Tree canopy share,"Block-group tree canopy share, the measure the Tree Equity Score is derived from","share, 0-1",block group,2023,American Forests Tree Equity Score,278
 Park acreage within 800 m,Total park area within the 800 m buffer,acres,800 m buffer,2024,Denver Regional Council of Governments parks and open space,358
 Distance to nearest park,Straight-line distance from the residence to the nearest park polygon,m,residence,2024,Denver Regional Council of Governments parks and open space,358
 Tree canopy land cover,Share of the 800 m buffer classified as tree canopy,share of buffer,800 m buffer,2020,Denver Regional Council of Governments regional land cover,358
 NDVI,"Mean normalized difference vegetation index within the 800 m buffer, averaged over growing-season composites","index, -1 to 1",800 m buffer,2019 growing season,"MODIS MOD13Q1 (250 m, 16-day) via the ORNL DAAC",358
-CATEGORY 4: Safety and environmental quality,,,,,,
+DOMAIN 4: Safety and environmental quality,,,,,,
 Crash density,All reported crashes within the 800 m buffer divided by buffer area,crashes/sq km,800 m buffer,2019,Denver Regional Council of Governments regional crash records,358
 Pedestrian crash density,Crashes involving a pedestrian within the 800 m buffer divided by buffer area,crashes/sq km,800 m buffer,2019,Denver Regional Council of Governments regional crash records,358
 Bicycle crash density,Crashes involving a cyclist within the 800 m buffer divided by buffer area,crashes/sq km,800 m buffer,2019,Denver Regional Council of Governments regional crash records,358
 Impervious surface land cover,Share of the 800 m buffer classified as impervious surface,share of buffer,800 m buffer,2020,Denver Regional Council of Governments regional land cover,358
 Air quality: fine particle pollution (PM2.5),Modelled annual mean fine particulate concentration,micrograms/cu m,block group,2022,Colorado EnviroScreen v2,278
 Proximity to Superfund (NPL) sites,Proximity index rising with the number of National Priorities List sites nearby and falling with distance from them; not a distance,index,block group,2022,Colorado EnviroScreen v2,278
-LAND USE AND REGULATION VARIABLES,,,,,,
+DOMAIN 5: Land use and regulation,,,,,,
 Zoning category,"Generalized zoning at the parcel: residential low density (reference), residential medium-to-high density, mixed use, nonresidential",4 categories,parcel,2023,Harmonized Denver MSA parcel zoning,337
 ADUs permitted,Whether accessory dwelling units are permitted in the parcel's zone,0/1,parcel,2023,Harmonized Denver MSA parcel zoning,290
 Pedestrian focus area share,Share of the 800 m buffer inside a designated pedestrian focus area,share of buffer,800 m buffer,2023,Denver Regional Council of Governments pedestrian focus areas,358
