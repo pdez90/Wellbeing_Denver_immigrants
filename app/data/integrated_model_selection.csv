@@ -1,0 +1,6 @@
+domain,term,p,kept
+density_location,urban_center_nearest_dist_m_z,6.095902586933656e-4,TRUE
+access_transport,bike_facility_density_800_z,0.0024621619708385476,TRUE
+green_space,park_acres_half_mile_z,0.03384585818406671,TRUE
+safety_env,bike_crash_density_800_z,0.0017035155075920151,TRUE
+land_use,zone_adu_yes,0.2678342749509821,FALSE

@@ -1,0 +1,6 @@
+Variable,Unit,N,Missing,Mean,SD,Min,P25,Median,P75,Max
+HUD Jobs Proximity Index,"index, 0-100",278,103,54.12,25.05,0.00,43.00,54.00,74.00,99.00
+"Sidewalk density, 800 m",m/km²,358,23,"22,527.23","7,021.37","2,992.95","16,547.87","22,783.27","29,105.85","35,164.01"
+"Bicycle facility density, 800 m",m/km²,358,23,"1,716.75","1,044.45",0.00,"1,005.47","1,524.83","2,392.26","7,182.93"
+"Active corridor density, 800 m",m/km²,358,23,"1,277.61",669.42,0.00,804.07,"1,293.63","1,677.39","4,078.51"
+Transportation cost at area median income,% of income,358,23,16.96,2.58,9.00,15.00,17.00,19.00,25.00

@@ -1,0 +1,17 @@
+Variable,Category,N,Percent,Missing
+Female,No,117,31.45,9
+,Yes,255,68.55,
+Married,No,131,35.31,10
+,Yes,240,64.69,
+Previously married (sep./div./widowed),No,321,86.52,10
+,Yes,50,13.48,
+Hispanic,No,110,29.57,9
+,Yes,262,70.43,
+Race: White,No,62,16.94,15
+,Yes,304,83.06,
+Lawful permanent resident,No,256,69.75,14
+,Yes,111,30.25,
+No official status (undocumented),No,275,74.93,14
+,Yes,92,25.07,
+"DACA, student/work visa, refugee, asylee",No,292,79.56,14
+,Yes,75,20.44,

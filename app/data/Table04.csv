@@ -1,0 +1,96 @@
+ ,Density and location,Transportation,Green space,Safety and environment
+Age,-0.001,-0.001,-0.002,-0.001
+,(0.008),(0.008),(0.008),(0.008)
+Number of children,-0.015,-0.003,-0.039,-0.029
+,(0.060),(0.058),(0.059),(0.059)
+Household income,0.048,0.044,0.068*,0.064*
+,(0.031),(0.030),(0.031),(0.030)
+Education,-0.031,-0.027,-0.052,-0.023
+,(0.043),(0.041),(0.042),(0.042)
+English proficiency,0.006,0.027,0.053,0.043
+,(0.065),(0.064),(0.065),(0.064)
+Years in Denver metro,-0.032,-0.016,-0.006,0.050
+,(0.098),(0.096),(0.097),(0.096)
+Years in neighborhood,0.099,0.084,0.093,0.036
+,(0.086),(0.084),(0.085),(0.085)
+Female,-0.049,-0.029,-0.006,-0.050
+,(0.148),(0.145),(0.146),(0.146)
+Married,0.163,0.215,0.327,0.189
+,(0.204),(0.197),(0.201),(0.201)
+Previously married,0.029,0.104,0.195,0.134
+,(0.274),(0.263),(0.266),(0.266)
+Hispanic,-0.003,0.039,-0.004,-0.014
+,(0.197),(0.193),(0.198),(0.196)
+Race: White,-0.021,-0.068,-0.066,0.017
+,(0.242),(0.236),(0.241),(0.239)
+Lawful permanent resident,-0.089,-0.056,-0.067,-0.162
+,(0.202),(0.198),(0.203),(0.201)
+No official status,0.157,0.191,0.181,0.120
+,(0.222),(0.216),(0.222),(0.222)
+DACA/visa/refugee/asylee,-0.036,-0.039,-0.010,-0.096
+,(0.222),(0.215),(0.221),(0.221)
+Percent below poverty,0.084,0.068,0.118,0.110
+,(0.085),(0.086),(0.089),(0.086)
+Percent foreign-born,-0.053,-0.025,-0.052,-0.028
+,(0.118),(0.119),(0.127),(0.117)
+Neighborhood SES index,0.026,0.037,0.073,0.050
+,(0.122),(0.126),(0.107),(0.111)
+Percent non-Hispanic white,0.151,0.058,0.022,0.101
+,(0.134),(0.137),(0.131),(0.125)
+Residential diversity,0.026,-0.062,-0.158,-0.017
+,(0.122),(0.116),(0.119),(0.129)
+Experienced diversity,0.058,0.075,0.156,0.114
+,(0.131),(0.123),(0.121),(0.124)
+Population density,0.170,,,
+,(0.234),,,
+Housing density,-0.215,,,
+,(0.271),,,
+Share of multifamily housing,0.005,,,
+,(0.103),,,
+Distance to downtown,0.022,,,
+,(0.122),,,
+Distance to urban center,0.208*,,,
+,(0.095),,,
+EPA Walkability Index,0.165+,,,
+,(0.086),,,
+Street intersection density,-0.085,,,
+,(0.080),,,
+Short-trip opportunity zone share,0.101,,,
+,(0.078),,,
+HUD Jobs Proximity Index,,-0.067,,
+,,(0.087),,
+Sidewalk density,,0.105,,
+,,(0.078),,
+Bicycle facility density,,0.244**,,
+,,(0.079),,
+Active corridor density,,-0.131,,
+,,(0.087),,
+Transportation cost,,-0.018,,
+,,(0.110),,
+Tree Equity Score,,,0.135,
+,,,(0.252),
+Tree canopy (Tree Equity),,,-0.324,
+,,,(0.207),
+Park acreage within 800 m,,,0.166*,
+,,,(0.084),
+Distance to nearest park,,,0.078,
+,,,(0.074),
+Tree canopy land cover (800 m),,,0.074,
+,,,(0.084),
+NDVI (800 m),,,0.171,
+,,,(0.110),
+Crash density,,,,-0.156
+,,,,(0.116)
+Pedestrian crash density,,,,-0.142
+,,,,(0.122)
+Bicycle crash density,,,,0.423**
+,,,,(0.133)
+Impervious surface (800 m),,,,0.022
+,,,,(0.076)
+PM2.5,,,,0.155
+,,,,(0.095)
+Proximity to Superfund (NPL) sites,,,,-0.163*
+,,,,(0.082)
+Observations,238,238,238,238
+R²,0.119,0.135,0.111,0.129
+Adjusted R²,-0.004,0.028,-0.003,0.017

@@ -1,0 +1,9 @@
+Variable,Unit,N,Missing,Mean,SD,Min,P25,Median,P75,Max
+Population density,persons/km²,356,25,"2,978.01","1,954.52",29.38,"1,598.06","2,854.27","4,066.99","13,497.41"
+Housing density,housing units/km²,356,25,"1,246.30","1,142.93",7.56,645.47,"1,105.58","1,451.67","10,255.19"
+Share of multifamily housing,% of units,356,25,38.36,32.83,0.00,4.07,32.36,65.70,100.00
+Distance to downtown Denver,km,358,23,10.66,6.25,0.62,5.71,9.12,14.00,51.58
+Distance to nearest urban center,m,358,23,"1,264.57","1,269.79",0.00,157.64,995.65,"2,151.73","12,487.84"
+EPA National Walkability Index,"index, 1-20",358,23,13.93,2.67,4.33,12.67,14.33,15.67,19.17
+Street intersection density,intersections/sq mile,278,103,165.11,54.64,26.60,135.27,165.52,207.08,500.61
+"Short-trip opportunity zone share, 800 m",share of buffer,358,23,0.35,0.32,0.00,0.03,0.26,0.55,1.00

@@ -1,0 +1,11 @@
+Variable,Unit,N,Missing,Mean,SD,Min,P25,Median,P75,Max
+Satisfaction: standard of living,1-5,366,15,3.71,1.19,1.00,3.00,4.00,5.00,5.00
+Satisfaction: health,1-5,361,20,3.79,1.12,1.00,3.00,4.00,5.00,5.00
+Satisfaction: life achievement,1-5,362,19,3.81,1.09,1.00,3.00,4.00,5.00,5.00
+Feels safe,1-5,349,32,3.91,1.09,1.00,3.00,4.00,5.00,5.00
+Feels accepted,1-5,356,25,3.85,1.09,1.00,3.00,4.00,5.00,5.00
+Confident about finances,1-5,354,27,3.48,1.20,1.00,3.00,4.00,4.00,5.00
+Feels a sense of belonging,1-5,368,13,3.79,1.16,1.00,3.00,4.00,5.00,5.00
+Trusts people in the neighborhood,1-5,365,16,3.45,1.17,1.00,3.00,4.00,4.00,5.00
+Could borrow from a neighbor,1-5,363,18,2.84,1.43,1.00,1.00,3.00,4.00,5.00
+Has contacts in the neighborhood,1-5,364,17,3.18,1.35,1.00,2.00,3.00,4.00,5.00

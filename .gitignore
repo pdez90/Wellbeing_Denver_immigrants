@@ -47,3 +47,9 @@ sessionInfo.txt
 !reference/*.csv
 
 # Shiny explorer: generated inputs (aggregates only, rebuilt by app/prepare_app_data.R)
+
+# The Shiny explorer inputs are aggregates only and are deployed from the repository
+!app/data/
+!app/data/**
+!app/www/
+!app/www/**

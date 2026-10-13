@@ -1,0 +1,12 @@
+table,group,kind,file
+A1,Outcomes,continuous,Table_A1_Outcomes_continuous.csv
+A2,Scale items,continuous,Table_A2_Scale_items_continuous.csv
+A3,Individual characteristics,continuous,Table_A3_Individual_characteristics_continuous.csv
+A4,Individual characteristics,categorical,Table_A4_Individual_characteristics_categorical.csv
+A5,Neighborhood demographics,continuous,Table_A5_Neighborhood_demographics_continuous.csv
+A6,"Density, location and urban form",continuous,Table_A6_Density_location_and_urban_form_continuous.csv
+A7,Transportation and accessibility,continuous,Table_A7_Transportation_and_accessibility_continuous.csv
+A8,Green space,continuous,Table_A8_Green_space_continuous.csv
+A9,Safety and environmental quality,continuous,Table_A9_Safety_and_environmental_quality_continuous.csv
+A10,Land use and regulation,continuous,Table_A10_Land_use_and_regulation_continuous.csv
+A11,Land use and regulation,categorical,Table_A11_Land_use_and_regulation_categorical.csv

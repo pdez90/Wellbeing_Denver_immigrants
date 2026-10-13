@@ -1,0 +1,121 @@
+check,item,published,rebuilt,difference,verdict
+descriptives,Population density [n],356,356,0,match
+descriptives,Population density [mean],2978.01,2978.009857470171,-1.4252982919060742e-4,match
+descriptives,Population density [sd],1954.52,1954.5150754680237,-0.00492453197625764,match
+descriptives,Housing density [n],356,356,0,match
+descriptives,Housing density [mean],1246.3,1246.301950727202,0.0019507272020291566,match
+descriptives,Housing density [sd],1142.93,1142.933194822493,0.003194822493014726,match
+descriptives,"Distance to downtown Denver, km [n]",358,358,0,match
+descriptives,"Distance to downtown Denver, km [mean]",10.66,10.658700022306352,-0.0012999776936482021,match
+descriptives,"Distance to downtown Denver, km [sd]",6.25,6.253148753484341,0.0031487534843410714,match
+descriptives,Percent below poverty [n],356,356,0,match
+descriptives,Percent below poverty [mean],15.84,15.839232283858868,-7.677161411319133e-4,match
+descriptives,Percent below poverty [sd],12.17,12.168507046792346,-0.0014929532076539687,match
+descriptives,Percent foreign-born [n],356,356,0,match
+descriptives,Percent foreign-born [mean],22.06,22.059517133613223,-4.8286638677552673e-4,match
+descriptives,Percent foreign-born [sd],10.64,10.636971101250296,-0.0030288987497044673,match
+descriptives,Neighborhood SES index [n],355,355,0,match
+descriptives,Neighborhood SES index [mean],0.02,0.02125912447662904,0.0012591244766290387,match
+descriptives,Neighborhood SES index [sd],0.9,0.8962007173052142,-0.0037992826947857994,match
+descriptives,EPA National Walkability Index [n],358,358,0,match
+descriptives,EPA National Walkability Index [mean],13.93,13.934823091247672,0.004823091247672551,match
+descriptives,EPA National Walkability Index [sd],2.67,2.6701548643155424,1.5486431554245783e-4,match
+descriptives,Street intersection density (per sq mile) [n],278,278,0,match
+descriptives,Street intersection density (per sq mile) [mean],165.11,165.10761953262806,-0.002380467371949635,match
+descriptives,Street intersection density (per sq mile) [sd],54.64,54.63596514156512,-0.0040348584348777194,match
+descriptives,"Distance to nearest urban center, m [n]",358,358,0,match
+descriptives,"Distance to nearest urban center, m [mean]",1264.57,1264.568710078435,-0.00128992156487584,match
+descriptives,"Distance to nearest urban center, m [sd]",1269.79,1269.7871312166033,-0.002868783396706931,match
+descriptives,HUD Jobs Proximity Index [n],278,278,0,match
+descriptives,HUD Jobs Proximity Index [mean],54.12,54.12230215827338,0.002302158273380428,match
+descriptives,HUD Jobs Proximity Index [sd],25.05,25.0486776441521,-0.0013223558479005249,match
+descriptives,Sidewalk density within 800 m [n],358,358,0,match
+descriptives,Sidewalk density within 800 m [mean],22366.17,22527.226411164127,161.0564111641288,within tolerance
+descriptives,Sidewalk density within 800 m [sd],7078.1,7021.366868170487,-56.733131829513695,within tolerance
+descriptives,Bicycle facility density within 800 m [n],358,358,0,match
+descriptives,Bicycle facility density within 800 m [mean],1716.75,1716.747901626918,-0.0020983730819352786,match
+descriptives,Bicycle facility density within 800 m [sd],1044.45,1044.448905965559,-0.00109403444093914,match
+descriptives,Active transportation corridor density within 800 m [n],358,358,0,match
+descriptives,Active transportation corridor density within 800 m [mean],1277.61,1277.6092750484268,-7.249515731473366e-4,match
+descriptives,Active transportation corridor density within 800 m [sd],669.42,669.41676787640165,-0.0032321235983090446,match
+descriptives,Transportation cost index [n],358,358,0,match
+descriptives,Transportation cost index [mean],16.96,16.960893854748605,8.938547486039283e-4,match
+descriptives,Transportation cost index [sd],2.58,2.581691905000107,0.0016919050001069635,match
+descriptives,Tree Equity Score [n],278,278,0,match
+descriptives,Tree Equity Score [mean],85.79,85.78776978417267,-0.002230215827339066,match
+descriptives,Tree Equity Score [sd],6.96,6.963151703846503,0.0031517038465027625,match
+descriptives,Tree canopy share [n],278,278,0,match
+descriptives,Tree canopy share [mean],0.15,0.15378309352517985,0.003783093525179859,match
+descriptives,Tree canopy share [sd],0.07,0.06921719258421508,-7.828074157849307e-4,match
+descriptives,Park acres within 800 m [n],358,358,0,match
+descriptives,Park acres within 800 m [mean],43.62,43.622665464597965,0.0026654645979675706,match
+descriptives,Park acres within 800 m [sd],46.07,46.07040512534773,4.051253477328487e-4,match
+descriptives,"Distance to nearest park, m [n]",358,358,0,match
+descriptives,"Distance to nearest park, m [mean]",228.53,228.53013586169178,1.3586169177415286e-4,match
+descriptives,"Distance to nearest park, m [sd]",183.49,183.49357104664637,0.00357104664635699,match
+descriptives,Tree canopy land cover within 800 m [n],358,358,0,match
+descriptives,Tree canopy land cover within 800 m [mean],0.12,0.1217735353972449,0.0017735353972449103,match
+descriptives,Tree canopy land cover within 800 m [sd],0.06,0.062075051137786066,0.0020750511377860686,match
+descriptives,Impervious surface within 800 m [n],358,358,0,match
+descriptives,Impervious surface within 800 m [mean],0.43,0.42909614108654387,-9.038589134561237e-4,match
+descriptives,Impervious surface within 800 m [sd],0.11,0.1125111213801343,0.002511121380134304,match
+descriptives,Crash density within 800 m [n],358,358,0,match
+descriptives,Crash density within 800 m [mean],76.76,76.76002894302898,2.8943028979711016e-5,match
+descriptives,Crash density within 800 m [sd],56.34,56.33929917521202,-7.008247879838336e-4,match
+descriptives,Pedestrian crash density within 800 m [n],358,358,0,match
+descriptives,Pedestrian crash density within 800 m [mean],2.85,2.8535636619304556,0.0035636619304555417,match
+descriptives,Pedestrian crash density within 800 m [sd],3.65,3.6517294667726254,0.001729466772625532,match
+descriptives,Bicycle crash density within 800 m [n],358,358,0,match
+descriptives,Bicycle crash density within 800 m [mean],0.88,0.8807981312872001,7.981312872000768e-4,match
+descriptives,Bicycle crash density within 800 m [sd],1.35,1.3517894441343514,0.0017894441343513368,match
+descriptives,Short-trip opportunity zone share within 800 m [n],358,358,0,match
+descriptives,Short-trip opportunity zone share within 800 m [mean],0.35,0.347508919119474,-0.0024910808805259643,match
+descriptives,Short-trip opportunity zone share within 800 m [sd],0.32,0.3249546786963311,0.004954678696331094,match
+descriptives,Residential diversity index [n],358,358,0,match
+descriptives,Residential diversity index [mean],0.5,0.5025725691432433,0.0025725691432433306,match
+descriptives,Residential diversity index [sd],0.16,0.1556327494621859,-0.004367250537814116,match
+descriptives,Experienced diversity index [n],358,358,0,match
+descriptives,Experienced diversity index [mean],0.24,0.23500367147802653,-0.004996328521973459,match
+descriptives,Experienced diversity index [sd],0.04,0.04283585123192474,0.0028358512319247367,match
+mediation,Distance to urban center [ACME],0.087,0.08668110467275571,-3.188953272442868e-4,match
+mediation,Distance to urban center [n],304,304,0,match
+mediation,Distance to urban center [ADE],0.094,0.09371356704793649,-2.864329520635145e-4,match
+mediation,Distance to urban center [total],0.18,0.1803946717206922,3.9467172069221346e-4,match
+mediation,Distance to urban center [ACME p],0,0,0,match
+mediation,Distance to urban center [ACME p Holm],0,0,0,match
+mediation,Bicycle facility density [ACME],0.045,0.04539701106162727,3.9701106162726846e-4,match
+mediation,Bicycle facility density [n],304,304,0,match
+mediation,Bicycle facility density [ADE],0.147,0.14727466147361487,2.746614736148789e-4,match
+mediation,Bicycle facility density [total],0.193,0.19267167253524217,-3.283274647578327e-4,match
+mediation,Bicycle facility density [ACME p],0.03,0.03,0,match
+mediation,Bicycle facility density [ACME p Holm],0.12,0.12,0,match
+mediation,Park acreage within 800 m [ACME],0.049,0.04941830796174878,4.1830796174877755e-4,match
+mediation,Park acreage within 800 m [n],304,304,0,match
+mediation,Park acreage within 800 m [ADE],0.11,0.10979953951089708,-2.0046048910292436e-4,match
+mediation,Park acreage within 800 m [total],0.159,0.15921784747264586,2.1784747264586013e-4,match
+mediation,Park acreage within 800 m [ACME p],0.06,0.06,0,match
+mediation,Park acreage within 800 m [ACME p Holm],0.18,0.18,0,match
+mediation,Bicycle crash density [ACME],-0.005,-0.00471660767825629,2.8339232174371017e-4,match
+mediation,Bicycle crash density [n],304,304,0,match
+mediation,Bicycle crash density [ADE],0.151,0.15115856552219417,1.585655221941762e-4,match
+mediation,Bicycle crash density [total],0.146,0.14644195784393788,4.419578439378846e-4,match
+mediation,Bicycle crash density [ACME p],0.756,0.756,0,match
+mediation,Bicycle crash density [ACME p Holm],1,1,0,match
+mediation,Pedestrian focus area share [ACME],-0.014,-0.01374970210401934,2.502978959806595e-4,match
+mediation,Pedestrian focus area share [n],304,304,0,match
+mediation,Pedestrian focus area share [ADE],0.032,0.03193454107675009,-6.545892324991143e-5,match
+mediation,Pedestrian focus area share [total],0.018,0.01818483897273073,1.8483897273073244e-4,match
+mediation,Pedestrian focus area share [ACME p],0.62,0.62,0,match
+mediation,Pedestrian focus area share [ACME p Holm],1,1,0,match
+mediation,ADU permitted [ACME],-0.131,-0.1313694386904861,-3.694386904860847e-4,match
+mediation,ADU permitted [n],245,245,0,match
+mediation,ADU permitted [ADE],0.014,0.01445527196146726,4.552719614672601e-4,match
+mediation,ADU permitted [total],-0.117,-0.11691416672901886,8.583327098114768e-5,match
+mediation,ADU permitted [ACME p],0.016,0.016,0,match
+mediation,ADU permitted [ACME p Holm],0.08,0.08,0,match
+sensitivity,Distance to urban center [rho*],0.36,0.3600000000000001,1.1102230246251565e-16,match
+sensitivity,Bicycle facility density [rho*],0.37,0.3700000000000001,1.1102230246251565e-16,match
+sensitivity,Park acreage within 800 m [rho*],0.37,0.3700000000000001,1.1102230246251565e-16,match
+sensitivity,Bicycle crash density [rho*],0.39,0.3900000000000001,1.1102230246251565e-16,match
+sensitivity,Pedestrian focus area share [rho*],0.39,0.3900000000000001,1.1102230246251565e-16,match
+sensitivity,ADU permitted [rho*],0.42,0.41999999999999993,-5.551115123125783e-17,match

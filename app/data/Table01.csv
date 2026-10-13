@@ -1,0 +1,40 @@
+Variable,N,Mean or %,SD,Minimum,Maximum
+Panel A. Continuous and ordinal measures,,,,,
+Subjective well-being index,368,3.75,0.94,1.00,5.00
+Neighborhood belonging index,370,3.31,1.01,1.00,5.00
+Age (years),363,38.66,10.46,18.00,84.00
+Number of children,377,2.05,1.62,0.00,6.00
+Household income (ordinal band),370,3.06,2.73,0.00,11.00
+Educational attainment (ordinal),377,2.81,2.35,0.00,7.00
+English-speaking proficiency (1-5),375,3.50,1.35,1.00,5.00
+Years in Denver metro (ordinal),374,1.98,1.01,0.00,3.00
+Years in current neighborhood (ordinal),374,1.39,1.02,0.00,3.00
+Panel B. Categorical measures,,,,,
+Gender,,,,,
+   Male,372,31.5%,—,—,—
+   Female,372,68.5%,—,—,—
+Marital status,,,,,
+"   Single, never married",371,21.8%,—,—,—
+   Married,371,64.7%,—,—,—
+   Separated,371,4.3%,—,—,—
+   Divorced,371,7.0%,—,—,—
+   Widowed,371,2.2%,—,—,—
+Ethnicity,,,,,
+   Hispanic,372,70.4%,—,—,—
+   Not Hispanic,372,29.6%,—,—,—
+Race,,,,,
+   African American,366,8.5%,—,—,—
+   Pacific Islander/Filipino/Hawaiian,366,0.5%,—,—,—
+   Asian,366,5.5%,—,—,—
+   Native American,366,1.1%,—,—,—
+   White,366,83.1%,—,—,—
+   Other,366,1.4%,—,—,—
+Immigration status,,,,,
+   Naturalized U.S. citizen,367,24.3%,—,—,—
+   Lawful permanent resident,367,30.2%,—,—,—
+   No official status (undocumented),367,25.1%,—,—,—
+   DACA recipient,367,3.5%,—,—,—
+   Student visa,367,2.7%,—,—,—
+   Refugee status,367,4.6%,—,—,—
+   Asylee status,367,1.4%,—,—,—
+   Work visa,367,8.2%,—,—,—

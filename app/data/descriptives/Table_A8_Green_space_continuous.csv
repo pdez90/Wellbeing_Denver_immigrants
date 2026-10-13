@@ -1,0 +1,7 @@
+Variable,Unit,N,Missing,Mean,SD,Min,P25,Median,P75,Max
+Tree Equity Score,"score, 0-100",278,103,85.79,6.96,67.00,80.00,86.00,91.00,100.00
+Tree canopy share (Tree Equity),"share, 0-1",278,103,0.15,0.07,0.01,0.11,0.16,0.20,0.39
+Park acreage within 800 m,acres,358,23,43.62,46.07,0.00,15.67,25.11,58.04,298.94
+Distance to nearest park,m,358,23,228.53,183.49,2.06,71.52,198.80,354.31,937.97
+"Tree canopy land cover, 800 m",share of buffer,358,23,0.12,0.06,0.00,0.08,0.12,0.16,0.32
+"NDVI, 800 m","index, -1 to 1",358,23,0.37,0.07,0.16,0.35,0.38,0.41,0.57

@@ -1,0 +1,7 @@
+Variable,Unit,N,Missing,Mean,SD,Min,P25,Median,P75,Max
+"Crash density, 800 m",crashes/km²,358,23,76.76,56.34,2.49,33.45,65.15,107.93,388.93
+"Pedestrian crash density, 800 m",crashes/km²,358,23,2.85,3.65,0.00,0.50,1.99,3.48,27.85
+"Bicycle crash density, 800 m",crashes/km²,358,23,0.88,1.35,0.00,0.00,0.50,1.49,16.41
+"Impervious surface land cover, 800 m",share of buffer,358,23,0.43,0.11,0.10,0.36,0.43,0.50,0.72
+Fine particle pollution (PM2.5),µg/m³,278,103,9.07,0.36,7.85,8.71,9.12,9.34,10.17
+Proximity to Superfund (NPL) sites,index,278,103,1.09,2.29,0.00,0.26,0.51,0.71,12.20
