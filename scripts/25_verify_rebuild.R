@@ -13,8 +13,7 @@
 # The analysis was rebuilt on a new machine after the original working copy was
 # lost. The survey is byte-identical to the original, but every third-party
 # geospatial input had to be re-downloaded, and several of those sources have
-# since been revised: DRCOG replaced the Short Trip Opportunity Zones with a
-# version derived from the January 2026 Active Transportation Plan, the Urban
+# since been revised: the Urban
 # Centers layer no longer publishes the 2019 vintage, American Forests replaced
 # Tree Equity Score 1.0 with 2.0, CNT withdrew the 2019 H+T release, and MODIS
 # retired collection 6.0 in favour of 6.1.
@@ -69,8 +68,21 @@ TOL_EFFECT   <- 0.02     # 0.02 SD on an ACME or a coefficient
 TOL_RHO      <- 0.03
 
 report <- list()
+# A published figure carries only the precision it was printed with (Table 2
+# gives two decimals). A rebuilt value that rounds to the published figure at
+# that precision therefore reproduces it, whatever the tolerance below says --
+# for small-scale variables (an index with SD 0.04) the rounding step is wider
+# than 5 per cent of the SD, and without this rule a perfect reproduction would
+# be reported as drift.
+printed_dp <- function(x) {
+  s <- sub("0+$", "", format(x, scientific = FALSE, trim = TRUE))
+  if (grepl("\\.", s)) nchar(sub(".*\\.", "", s)) else 0L
+}
 add <- function(check, item, published, rebuilt, tol, kind, scale = NA_real_) {
   ok <- if (is.na(published) || is.na(rebuilt)) NA else {
+    same_at_printed_precision <-
+      abs(round(rebuilt, printed_dp(published)) - published) < 1e-9
+    same_at_printed_precision ||
     if (kind == "rel")      abs(rebuilt - published) <= tol * max(abs(published), 1e-9)
     else if (kind == "sd")  abs(rebuilt - published) <= tol * scale
     else                    abs(rebuilt - published) <= tol
@@ -119,7 +131,6 @@ T2_MAP <- c(
 # annotated; the rest are left blank.
 AT_RISK <- c(
   urban_center_nearest_dist_m = "DRCOG Urban Centers -- 2019 vintage no longer published",
-  short_trip_zone_share_800   = "DRCOG Short Trip Opportunity Zones -- replaced by the Jan 2026 ATP version",
   bike_facility_density_800   = "DRCOG Bicycle Facility Inventory -- undated, continuously updated",
   park_acres_half_mile        = "DRCOG Parks and Open Space -- 2024 vintage unconfirmed",
   park_nearest_dist_m         = "DRCOG Parks and Open Space -- 2024 vintage unconfirmed",

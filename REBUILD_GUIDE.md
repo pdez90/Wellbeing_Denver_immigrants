@@ -9,6 +9,18 @@ downloading anything.**
 
 ---
 
+## 0. Outcome (13 October 2026)
+
+The rebuild is complete and `25_verify_rebuild.R` reports **96 of 96 checks
+matching**: every Table 2 descriptive, every Table 9 mediation effect and the
+sensitivity rho* values reproduce the manuscript. Of the sources listed in §1,
+the 2019 Urban Centers layer and the 2019 H+T file were both recovered at
+original vintage, and the Short Trip Opportunity Zones turned out not to have
+changed. The only input not at original vintage is the 2022 sidewalk
+planimetrics (sidewalk density within 800 m: rebuilt mean 22,527 vs published
+22,366, 2.3 per cent of the SD; within tolerance, disclosed here). The §1 table
+is kept as written on 8 September as a record of what was feared.
+
 ## 1. The finding that shapes everything else
 
 Between the original run and now, several of the upstream sources have been
@@ -18,7 +30,7 @@ published. Checked against the live portals on 8 September 2026:
 | Source | Variable(s) it feeds | Status |
 |---|---|---|
 | DRCOG **Urban Centers** | `urban_center_nearest_dist_m` | **2019 vintage not published anywhere.** Live layer modified 6 Jan 2026. |
-| DRCOG **Short Trip Opportunity Zones** | `short_trip_zone_share_800` | **Replaced.** Current layer created Nov 2025, derived from the ATP adopted Jan 2026. No prior version published. |
+| DRCOG **Short Trip Opportunity Zones** | `short_trip_zone_share_800` | **Resolved (13 Oct 2026).** The current layer (created Nov 2025, 2026 ATP, 172 TAZ polygons) *is* the vintage the paper used: it reproduces the published descriptive exactly. An older republication held by Jefferson County Open Space (Nov 2024) does not. See `data/short_trip_opportunity_zones/README.txt`. |
 | American Forests **Tree Equity Score** | `tree_tes`, `tree_treecanopy` | **TES 1.0 replaced by TES 2.0** (2023). New canopy data, revised boundaries, and adjusted biome targets for grassland- and desert-adjacent cities — which is Colorado specifically. |
 | CNT **H+T Affordability Index** | `ht_t_ami` | **2019 release withdrawn.** Old file URLs 404. Current release uses 2022 ACS. Download now requires registration; CNT directs longitudinal requests to `info@cnt.org`. |
 | DRCOG **Bicycle Facility Inventory** | `bike_facility_density_800` | Undated and continuously updated; DRCOG does not publish dated snapshots. |
@@ -56,7 +68,6 @@ supply the archived layers. Which leads to the first action.
 Email **geospatial@drcog.org** and ask whether archived copies exist of:
 
 - Urban Centers, 2019 vintage
-- Short Trip Opportunity Zones, the version predating the Jan 2026 ATP
 - Parks and Open Space, 2024 vintage
 - Bicycle Facility Inventory, a snapshot from the original run period
 

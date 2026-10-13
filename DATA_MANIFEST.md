@@ -39,9 +39,9 @@ Total on-disk size is roughly 9 GB, dominated by the DRCOG land-cover raster.
 | `pedestrian_focus_areas/*.shp` | 04 | DRCOG pedestrian focus areas. |
 | `urban_centers_2019/*.shp` | 04 | DRCOG urban centers, 2019. |
 | `crash_2019.csv` | 04 | DRCOG regional crash records, 2019. A shapefile version exists at `crash_2019/drcog_crash_2019.shp`; the CSV is the one used. |
-| `short_trip_opportunity_zones/*.shp` | 05 | DRCOG short-trip opportunity zones. |
+| `short_trip_opportunity_zones/*.shp` | 05 | DRCOG short-trip opportunity zones, 2026 Active Transportation Plan version (ArcGIS item 264efadfe76741cca9d374a63945ab8c; 172 TAZ-based polygons). Only the geometry is used. |
 | `htaindex2019_data_blkgrps_08.csv` | 05 | CNT Housing + Transportation Affordability Index, 2019, Colorado block groups. |
-| `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Zhou & Lu (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. |
+| `seg_poi.csv` | 05 | Experienced income segregation and travel distance by block group. Replication data for Zhou & Lu (2025), *Nature Communications* 16:11236, doi:10.1038/s41467-025-66585-z; deposited at figshare, project 266242. Derived from SafeGraph 2019 weekly patterns. Built from the sheet "Fig.5, Suppl. Fig.18-20" of `Source Data.xlsx` with `cbgid` zero-padded to 12 digits. |
 | `diversity_CO.csv` | 05 | Residential and experienced racial-ethnic diversity, Colorado census tracts. Xu, W., Wang, Z., Attia, N., Attia, Y., Zhang, Y., & Zong, H. (2024). "An experienced racial-ethnic diversity dataset in the United States using human mobility data." *Scientific Data*, 11, 638. doi:10.1038/s41597-024-03490-y; deposited at https://doi.org/10.17605/OSF.IO/X94GJ as state-level CSV and GeoJSON files. |
 
 ## Note on `diversity_CO.csv`
