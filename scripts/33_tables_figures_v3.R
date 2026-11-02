@@ -4,7 +4,7 @@
 # v3 parallel-outcome analysis.
 #
 #   INPUT : v3_*.csv (31, 32)
-#   OUTPUT: v3_tables/Table1_main_models.csv / .docx    compact main-text table
+#   OUTPUT: v3_tables/Table2_main_models.csv            compact main-text table (Table 2)
 #           v3_tables/TableS_*.csv                       supplement tables
 #           v3_tables/V3_Tables.docx                     all tables, one file
 #           figures/FigureV3_coefficients.png / .pdf     SWB vs NSC coefficient plot
@@ -64,10 +64,10 @@ fit_rows <- function(block) {
   if (block == "controls") out[-3, ] else out
 }
 
-# ---- Table 1 (main text): full models, NBE terms + demographic controls ----------
+# ---- Table 2 (main text): full models, NBE terms + demographic controls ----------
 main <- co %>% dplyr::filter(frame == "main", block == "full", group != "intercept", group != "Individual characteristics")
 T1 <- dplyr::bind_rows(two_col(main, lab_order), fit_rows("full"))
-readr::write_csv(T1, file.path(tab_dir, "Table2_main_models.csv"))
+readr::write_csv(dplyr::rename(T1, Predictor = label), file.path(tab_dir, "Table2_main_models.csv"))
 
 # ---- Supplement tables ---------------------------------------------------------
 # S-A: baseline (controls only), both outcomes, every coefficient
@@ -87,7 +87,7 @@ dom_tab <- function(oc) {
 }
 TSB <- dom_tab("swb"); TSC <- dom_tab("nsc")
 # S-D: full models with every coefficient
-TSD <- dplyr::bind_rows(two_col(co %>% dplyr::filter(frame == "main", block == "full", !group %in% "intercept"), c(ctrl_order, v3_label(V3_CONTROL_VARS), lab_order), headers = FALSE), fit_rows("full"))
+TSD <- dplyr::bind_rows(two_col(co %>% dplyr::filter(frame == "main", block == "full", !group %in% "intercept"), c(ctrl_order, v3_label(V3_CONTROL_VARS), v3_label(unlist(V3_DOMAIN_VARS))), headers = FALSE), fit_rows("full"))
 # S-E: variants, NBE terms only, columns = main | +urban center | +residential diversity | rail distance ; per outcome
 var_tab <- function(oc) {
   keep <- c(paste0(oc, ":full"), paste0(oc, ":full_urban_center"), paste0(oc, ":full_resdiv"), paste0(oc, ":full_rail_dist"))
@@ -104,10 +104,10 @@ var_tab <- function(oc) {
 }
 TSE_swb <- var_tab("swb"); TSE_nsc <- var_tab("nsc")
 # S-F: single-item belonging vs composite, same respondents
-b1 <- co %>% dplyr::filter(model %in% c("nsc:full_belong1", "belong1:full_belong1"), !group %in% c("intercept", "Individual characteristics")) %>%
+b1 <- co %>% dplyr::filter(model %in% c("nsc:full_belong1", "belong1:full_belong1"), !group %in% "intercept") %>%
   dplyr::mutate(col = ifelse(outcome == "nsc", "NSC composite (4 items)", "Single belonging item")) %>%
   dplyr::select(label, col, cell) %>% tidyr::pivot_wider(names_from = col, values_from = cell)
-b1 <- b1[match(lab_order, b1$label), ]; b1 <- b1[!is.na(b1$label), ]
+b1 <- b1[match(c(v3_label(unlist(V3_DOMAIN_VARS)), v3_label(V3_CONTROL_VARS), ctrl_order), b1$label), ]; b1 <- b1[!is.na(b1$label), ]
 fb <- fit %>% dplyr::filter(model %in% c("nsc:full_belong1", "belong1:full_belong1"))
 TSF <- dplyr::bind_rows(as.data.frame(b1), data.frame(label = c("Observations", "Adjusted R²"),
   `NSC composite (4 items)` = c(sprintf("%d", fb$n[fb$model == "nsc:full_belong1"]), sprintf("%.3f", fb$adj_r2[fb$model == "nsc:full_belong1"])),
@@ -119,33 +119,36 @@ TSH <- buf %>% dplyr::mutate(outcome = V3_OUTCOME_LABELS[outcome]) %>% dplyr::se
   tidyr::pivot_wider(names_from = radius_m, values_from = cell, names_prefix = "") %>%
   dplyr::rename(Outcome = outcome, Measure = measure, `400 m` = `400`, `800 m` = `800`, `1,600 m` = `1600`)
 # S-I: standard errors
+pdf_ <- getq("df_residual_full"); pt2 <- function(b, se) 2 * stats::pt(abs(b / se), pdf_, lower.tail = FALSE)
 TSI <- ses %>% dplyr::transmute(Outcome = V3_OUTCOME_LABELS[outcome], Predictor = label, Estimate = sprintf("%.3f", estimate),
   `SE (OLS)` = sprintf("%.3f", se_ols), `SE (tract)` = sprintf("%.3f", se_cluster_tract), `SE (block group)` = sprintf("%.3f", se_cluster_bg),
   `SE (Conley 1 km)` = sprintf("%.3f", se_conley_1km), `SE (2 km)` = sprintf("%.3f", se_conley_2km), `SE (5 km)` = sprintf("%.3f", se_conley_5km),
-  `p (OLS)` = sprintf("%.3f", p_ols), `p (tract)` = sprintf("%.3f", p_cluster_tract), `p (2 km)` = sprintf("%.3f", p_conley_2km))
+  `p (OLS)` = sprintf("%.3f", p_ols), `p (tract)` = sprintf("%.3f", p_cluster_tract), `p (block group)` = sprintf("%.3f", pt2(estimate, se_cluster_bg)),
+  `p (1 km)` = sprintf("%.3f", pt2(estimate, se_conley_1km)), `p (2 km)` = sprintf("%.3f", p_conley_2km), `p (5 km)` = sprintf("%.3f", pt2(estimate, se_conley_5km)))
 # S-J: MM
 TSJ <- mmt %>% dplyr::transmute(Outcome = V3_OUTCOME_LABELS[outcome], Predictor = label, N = n, OLS = ols, `Robust MM` = robust_mm, Change = sprintf("%+.3f", change))
 # S-K: bootstrap
 TSK <- bt %>% dplyr::transmute(Outcome = V3_OUTCOME_LABELS[outcome], Predictor = label, Estimate = sprintf("%.3f", estimate),
   `Bootstrap SE` = sprintf("%.3f", boot_se), `95% percentile CI` = sprintf("(%.3f, %.3f)", ci_low, ci_high),
-  `Excludes 0` = ifelse(excludes_zero, "yes", "no"), `OLS p` = sprintf("%.3f", ols_p))
+  `Excludes 0` = ifelse(excludes_zero, "yes", "no"), `p (OLS)` = sprintf("%.3f", ols_p))
 
 TABLES <- list(
   list(id = "Table 2", title = "Neighborhood built environment and the two outcomes: full models", df = T1,
        note = paste(NOTE_STARS, sprintf("Both models are estimated on the same %d respondents and additionally adjust for the fifteen individual characteristics reported in Table S4.", getq("n_common_sample")))),
   list(id = "Table S1", title = "Controls only: individual characteristics and neighborhood demographics", df = TSA, note = NOTE_STARS),
-  list(id = "Table S2", title = "Subjective well-being regressed on each NBE domain in turn", df = TSB, note = paste(NOTE_STARS, "Every column includes the individual and neighborhood demographic controls.")),
-  list(id = "Table S3", title = "Neighborhood social connectedness regressed on each NBE domain in turn", df = TSC, note = paste(NOTE_STARS, "Every column includes the individual and neighborhood demographic controls.")),
+  list(id = "Table S2", title = "Subjective well-being regressed on each neighborhood built environment (NBE) domain in turn", df = TSB, note = paste(NOTE_STARS, "Every column includes the individual and neighborhood demographic controls.")),
+  list(id = "Table S3", title = "Neighborhood social connectedness regressed on each neighborhood built environment (NBE) domain in turn", df = TSC, note = paste(NOTE_STARS, "Every column includes the individual and neighborhood demographic controls.")),
   list(id = "Table S4", title = "Full models with every coefficient", df = TSD, note = NOTE_STARS),
   list(id = "Table S5", title = "Specification variants, subjective well-being", df = TSE_swb, note = paste(NOTE_STARS, "Each column changes one thing relative to the main full model; individual and neighborhood demographic controls are included throughout.")),
   list(id = "Table S6", title = "Specification variants, neighborhood social connectedness", df = TSE_nsc, note = paste(NOTE_STARS, "Each column changes one thing relative to the main full model; individual and neighborhood demographic controls are included throughout.")),
   list(id = "Table S7", title = "Single belonging item versus the four-item NSC composite as the outcome", df = TSF, note = paste(NOTE_STARS, sprintf("Same predictors on the %d respondents who answered the belonging item (%d of the analytic sample did not). The two outcomes correlate at r = %.2f.", getq("n_belong1"), getq("n_common_sample") - getq("n_belong1"), getq("cor_nsc_belong1")))),
   list(id = "Table S8", title = "Variance inflation factors, full model", df = TSG, note = "Identical for the two outcomes because the predictor set is the same."),
   list(id = "Table S9", title = "Buffer radius: buffer-derived measures at 400 m, 800 m and 1,600 m", df = TSH, note = paste(NOTE_STARS, sprintf("All six buffer measures are swapped to the stated radius at once; park acreage is available at 800 m only and is held fixed, as are the non-buffer measures and controls. In the analytic sample %d respondents have a rail station within 400 m, %d within 800 m and %d within 1,600 m.", getq("n_rail_400"), getq("n_rail_800"), getq("n_rail_1600")))),
-  list(id = "Table S10", title = "Clustered and spatial standard errors, full models", df = TSI, note = "Cluster-robust (HC1) standard errors by census tract and block group, and Conley spatial HAC standard errors with a Bartlett kernel at 1, 2 and 5 km. Point estimates are unchanged; p-values use the OLS residual degrees of freedom."),
-  list(id = "Table S11", title = "Robust MM-estimator, full models", df = TSJ, note = paste(NOTE_STARS, "MM p-values use the OLS residual degrees of freedom.")),
-  list(id = "Table S12", title = "Nonparametric bootstrap, full models", df = TSK, note = "2,000 resamples of respondents; percentile intervals.")
+  list(id = "Table S10", title = "Clustered and spatial standard errors, full models", df = TSI, note = "OLS = ordinary least squares. Cluster-robust (HC1) standard errors by census tract and block group, and Conley spatial heteroskedasticity- and autocorrelation-consistent standard errors with a Bartlett kernel at 1, 2 and 5 km. Point estimates are unchanged; p-values use the OLS residual degrees of freedom."),
+  list(id = "Table S11", title = "Robust MM-estimator, full models", df = TSJ, note = paste(NOTE_STARS, "OLS = ordinary least squares. MM p-values use the OLS residual degrees of freedom.")),
+  list(id = "Table S12", title = "Nonparametric bootstrap, full models", df = TSK, note = "2,000 resamples of respondents; percentile intervals. OLS = ordinary least squares.")
 )
+TABLES <- lapply(TABLES, function(t) { if (names(t$df)[1] == "label") names(t$df)[1] <- "Predictor"; t })
 for (t in TABLES) readr::write_csv(t$df, file.path(tab_dir, paste0(gsub(" ", "", t$id), "_", gsub("[^A-Za-z0-9]+", "_", substr(t$title, 1, 40)), ".csv")))
 
 doc <- officer::read_docx()
@@ -155,7 +158,7 @@ for (t in TABLES) {
     flextable::fontsize(size = if (ncol(t$df) > 6) 7 else 8, part = "all") %>% flextable::bold(part = "header") %>%
     flextable::align(j = 1, align = "left", part = "all") %>% flextable::autofit()
   if (ncol(t$df) > 1) ft <- flextable::align(ft, j = 2:ncol(t$df), align = "center", part = "all")
-  hdr_rows <- which(t$df[[2]] == "" & !t$df[[1]] %in% c("Observations"))
+  hdr_rows <- if (ncol(t$df) >= 3) which(t$df[[2]] == "" & t$df[[3]] == "" & !t$df[[1]] %in% c("Observations")) else integer(0)
   if (length(hdr_rows) && t$id %in% c("Table 2")) ft <- flextable::bold(ft, i = hdr_rows) %>% flextable::italic(i = hdr_rows)
   doc <- officer::body_add_par(doc, sprintf("%s. %s", t$id, t$title), style = "heading 2")
   doc <- flextable::body_add_flextable(doc, ft)
